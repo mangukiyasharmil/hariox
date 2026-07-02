@@ -1,0 +1,110 @@
+project_id = "uzfccftfizleiyqzqoki"
+
+[functions.admin-setup]
+verify_jwt = false
+
+[functions.create-staff]
+verify_jwt = false
+
+[functions.send-sms]
+verify_jwt = false
+
+[functions.sms-credit-check]
+verify_jwt = false
+
+[functions.check-sms-delivery]
+verify_jwt = false
+
+[functions.send-daily-report]
+verify_jwt = false
+
+[functions.daily-sms-expense]
+verify_jwt = false
+
+[functions.upsert-lead]
+verify_jwt = false
+
+[functions.create-paytm-order]
+verify_jwt = false
+
+[functions.verify-paytm-payment]
+verify_jwt = false
+
+[functions.verify-phonepe-payment]
+verify_jwt = false
+
+[functions.create-phonepe-order]
+verify_jwt = false
+
+[functions.paytm-webhook]
+verify_jwt = false
+
+[functions.phonepe-webhook]
+verify_jwt = false
+
+[functions.send-whatsapp]
+verify_jwt = false
+
+[functions.whatsapp-account-status]
+verify_jwt = false
+
+[functions.execute-workflow]
+verify_jwt = false
+
+[functions.collect-lead]
+verify_jwt = false
+
+[functions.daily-pg-expense]
+verify_jwt = false
+
+[functions.remarketing-sms-scheduler]
+verify_jwt = false
+
+[functions.whatsapp-qr-connect]
+verify_jwt = false
+
+[functions.fetch-meta-templates]
+verify_jwt = false
+
+[functions.whatsapp-remarketing-scheduler]
+verify_jwt = false
+
+[functions.start-whatsapp-remarketing]
+verify_jwt = false
+
+[functions.abandoned-payment-reminder]
+verify_jwt = false
+
+[functions.send-payment-retry]
+verify_jwt = false
+
+[functions.whatsapp-webhook]
+verify_jwt = false
+
+[functions.razorpay-webhook]
+verify_jwt = false
+
+[functions.create-razorpay-order]
+verify_jwt = false
+
+[functions.verify-razorpay-payment]
+verify_jwt = false
+
+[functions.process-scheduled-actions]
+verify_jwt = false
+
+[functions.retry-failed-whatsapp]
+verify_jwt = false
+
+[functions.admin-password-reset]
+verify_jwt = false
+
+[functions.capture-lead-capital]
+verify_jwt = false
+
+[functions.sms-log-ingestion]
+verify_jwt = false
+
+[functions.send-otp]
+verify_jwt = false
+

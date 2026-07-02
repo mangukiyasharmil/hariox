@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://oreyfqrqkdgbkmnnnlqh.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://oreyfqrqkdgbkmnnnlqh.supabase.co" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <!-- Razorpay checkout — preconnect + preload so payment page opens instantly -->
+    <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin />
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+    <link rel="preload" as="script" href="https://checkout.razorpay.com/v1/checkout.js" />
+    
+    <!-- Google Analytics - Domain-aware, deferred for performance -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      (function(){
+        var h = window.location.hostname.toLowerCase();
+        var gaId;
+        if (h.indexOf('finance.hariox') !== -1 || h.indexOf('finance-hariox') !== -1) {
+          gaId = 'G-Q4REFTJL36';
+        } else {
+          gaId = 'G-6SSQKML1CB';
+        }
+        gtag('config', gaId);
+        window.addEventListener('load', function() {
+          var s = document.createElement('script');
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+          s.async = true;
+          document.head.appendChild(s);
+        });
+      })();
+    </script>
+
+    <!-- Meta Pixel - Domain-aware, loads immediately for crawler detection -->
+    <script>
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+      (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      (function(){
+        var h=window.location.hostname.toLowerCase();
+        var pixelId=null;
+        if(h.indexOf('finance.hariox')!==-1||h.indexOf('finance-hariox')!==-1){
+          pixelId='2560561001026701';
+        } else if(h.indexOf('capital.hariox')!==-1||h.indexOf('capital-hariox')!==-1){
+          // Capital pixel - add when available
+        } else {
+          pixelId='2138604833617582';
+        }
+        if(pixelId){
+          window._fbq_initialized_pixels=window._fbq_initialized_pixels||new Set();
+          fbq('init',pixelId);
+          fbq('track','PageView');
+          window._fbq_initialized_pixels.add(pixelId);
+        }
+      })();
+    </script>
+    <!-- noscript pixel fallbacks moved to body -->
+
+    <!-- Microsoft Clarity - Domain-aware (Credit site only) -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "wrtcob5l08");
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <title>Get ₹10 Lakh Loan in 24 Hours | Personal, Home, Business Loans</title>
+    <meta name="description" content="Trusted partner for all loan needs. Get fast loan approval up to ₹10 Lakh in just 24 hours. Home loans, business loans, personal loans with lowest interest rates starting from 8% p.a. Apply online now!">
+    <meta name="author" content="Credit Hariox" />
+    <meta name="keywords" content="loan, home loan, business loan, personal loan, education loan, vehicle loan, gold loan, fast loan approval, India, low interest rate, instant loan, quick loan, credit hariox, hariox finance, finance company, online loan application">
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <link rel="canonical" href="https://credit.hariox.com/" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e3a5f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Credit Hariox" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="application-name" content="Credit Hariox" />
+    
+    <!-- Manifest & Icons - NO default manifest link here! Added dynamically by script below -->
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png">
+
+    <!-- CRITICAL: Set correct manifest BEFORE browser reads it for A2HS -->
+    <script>
+      (function () {
+        try {
+          var isAdmin = window.location.pathname.startsWith("/admin");
+          var manifestHref = isAdmin ? '/admin-manifest.json' : '/manifest.json';
+          
+          // Create manifest link element - must be first thing
+          var manifestLink = document.createElement('link');
+          manifestLink.rel = 'manifest';
+          manifestLink.href = manifestHref;
+          document.head.appendChild(manifestLink);
+
+          // Update meta tags for correct PWA name
+          var appNameMeta = document.querySelector('meta[name="application-name"]');
+          var appleTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+          var themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+          if (isAdmin) {
+            if (appNameMeta) appNameMeta.setAttribute("content", "Hariox Admin");
+            if (appleTitleMeta) appleTitleMeta.setAttribute("content", "Hariox Admin");
+            if (themeColorMeta) themeColorMeta.setAttribute("content", "#0f172a");
+            document.title = "Hariox Admin";
+            
+            // Register admin service worker with /admin scope
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/admin-sw.js', { scope: '/admin/' })
+                .then(function(reg) { console.log('Admin SW registered:', reg.scope); })
+                .catch(function(err) { console.log('Admin SW failed:', err); });
+            }
+          } else {
+            // Register regular service worker for main site
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                .then(function(reg) { console.log('Main SW registered:', reg.scope); })
+                .catch(function(err) { console.log('Main SW failed:', err); });
+            }
+          }
+        } catch (e) {
+          // Fallback: add default manifest if script fails
+          var fallback = document.createElement('link');
+          fallback.rel = 'manifest';
+          fallback.href = '/manifest.json';
+          document.head.appendChild(fallback);
+        }
+      })();
+    </script>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://credit.hariox.com/" />
+    
+    
+    <meta property="og:image" content="https://credit.hariox.com/icons/icon-512.png">
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:site_name" content="Credit Hariox" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@CreditHariox" />
+    <meta name="twitter:creator" content="@CreditHariox" />
+    
+    
+    <meta name="twitter:image" content="https://credit.hariox.com/icons/icon-512.png">
+
+    <!-- Geo Tags for India -->
+    <meta name="geo.region" content="IN" />
+    <meta name="geo.placename" content="India" />
+    
+    <!-- Google Search Console Verification - Finance -->
+    <meta name="google-site-verification" content="YTHTMZEqL1kj38M9TGVg1ynDqxs8-7dAjyUcO-t0F1k" />
+    <!-- Google Search Console Verification - Credit -->
+    <meta name="google-site-verification" content="1PN_3o1auRB699-Hgn-f1rlQULHeGrubL3loY2CxKco" />
+
+    <style>
+      /* Safe area insets for mobile devices */
+      :root {
+        --sat: env(safe-area-inset-top);
+        --sar: env(safe-area-inset-right);
+        --sab: env(safe-area-inset-bottom);
+        --sal: env(safe-area-inset-left);
+      }
+    </style>
+    
+  
+  
+  
+  <meta property="og:title" content="Get ₹10 Lakh Loan in 24 Hours | Personal, Home, Business Loans">
+  <meta name="twitter:title" content="Get ₹10 Lakh Loan in 24 Hours | Personal, Home, Business Loans">
+  <meta property="og:description" content="Trusted partner for all loan needs. Get fast loan approval up to ₹10 Lakh in just 24 hours. Home loans, business loans, personal loans with lowest interest rates starting from 8% p.a. Apply online now!">
+  <meta name="twitter:description" content="Trusted partner for all loan needs. Get fast loan approval up to ₹10 Lakh in just 24 hours. Home loans, business loans, personal loans with lowest interest rates starting from 8% p.a. Apply online now!">
+</head>
+
+  <body>
+    <noscript>
+      <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2138604833617582&ev=PageView&noscript=1" />
+      <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1426295928979427&ev=PageView&noscript=1" />
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- Permanent startup recovery: stale chunks, failed script loads, and old SW caches -->
+    <script>
+      (function(){
+        var reloaded = sessionStorage.getItem('__chunk_reload') === '1';
+
+        function clearRecoveryFlag() {
+          sessionStorage.removeItem('__chunk_reload');
+          sessionStorage.removeItem('__chunk_reload_reason');
+          try {
+            var cleanUrl = new URL(window.location.href);
+            if (cleanUrl.searchParams.has('__cb')) {
+              cleanUrl.searchParams.delete('__cb');
+              window.history.replaceState({}, '', cleanUrl.toString());
+            }
+          } catch (_) {}
+        }
+
+        function hardResetAndReload(reason) {
+          if (reloaded) return;
+          reloaded = true;
+          sessionStorage.setItem('__chunk_reload', '1');
+          sessionStorage.setItem('__chunk_reload_reason', reason || 'startup-recovery');
+
+          var resetPromise = Promise.resolve();
+
+          if ('serviceWorker' in navigator) {
+            resetPromise = resetPromise.then(function () {
+              return navigator.serviceWorker.getRegistrations()
+                .then(function (registrations) {
+                  return Promise.all(
+                    registrations.map(function (registration) {
+                      return registration.unregister().catch(function () { return false; });
+                    })
+                  );
+                })
+                .catch(function () {});
+            });
+          }
+
+          if ('caches' in window) {
+            resetPromise = resetPromise.then(function () {
+              return caches.keys()
+                .then(function (keys) {
+                  return Promise.all(
+                    keys.map(function (key) {
+                      return caches.delete(key).catch(function () { return false; });
+                    })
+                  );
+                })
+                .catch(function () {});
+            });
+          }
+
+          resetPromise.finally(function () {
+            try {
+              var url = new URL(window.location.href);
+              url.searchParams.set('__cb', String(Date.now()));
+              window.location.replace(url.toString());
+            } catch (_) {
+              window.location.reload();
+            }
+          });
+        }
+
+        // Catch stale dynamic import errors
+        window.addEventListener('error', function(e){
+          var message = e && e.message ? e.message : '';
+          var target = e && e.target;
+          var isAssetScriptError = !!(
+            target &&
+            target.tagName === 'SCRIPT' &&
+            target.src &&
+            target.src.indexOf('/assets/') !== -1
+          );
+
+          var isStaleChunkError =
+            message.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+            message.indexOf('Importing a module script failed') !== -1 ||
+            message.indexOf('error loading dynamically imported module') !== -1 ||
+            message.indexOf('ChunkLoadError') !== -1;
+
+          if (isAssetScriptError || isStaleChunkError) {
+            hardResetAndReload('asset-or-chunk-error');
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(e){
+          var msg = e && e.reason && e.reason.message ? e.reason.message : '';
+          if(
+            msg.indexOf('Failed to fetch dynamically imported module')!==-1 ||
+            msg.indexOf('Importing a module script failed')!==-1 ||
+            msg.indexOf('error loading dynamically imported module')!==-1 ||
+            msg.indexOf('ChunkLoadError')!==-1
+          ){
+            e.preventDefault();
+            hardResetAndReload('unhandledrejection-stale-chunk');
+          }
+        });
+
+        // Clear flags after successful load so future deploys can self-heal again
+        if(reloaded){
+          window.addEventListener('load', function(){
+            setTimeout(clearRecoveryFlag, 5000);
+          });
+        }
+
+        // Blank screen fallback: if #root is still empty after 10s, force one hard reset
+        setTimeout(function(){
+          var root = document.getElementById('root');
+          if(root && root.children.length === 0){
+            hardResetAndReload('empty-root');
+          }
+        }, 10000);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2 @@
+ALTER TABLE public.sms_logs DROP CONSTRAINT IF EXISTS sms_logs_lead_id_fkey;
+ALTER TABLE public.sms_logs ADD CONSTRAINT sms_logs_lead_id_fkey FOREIGN KEY (lead_id) REFERENCES public.leads(id) ON DELETE SET NULL;

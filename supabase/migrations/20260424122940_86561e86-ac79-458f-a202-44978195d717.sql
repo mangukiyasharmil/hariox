@@ -1,0 +1,1 @@
+UPDATE public.companies SET meta_pixel_id = '2560561001026701', updated_at = now() WHERE slug = 'finance';

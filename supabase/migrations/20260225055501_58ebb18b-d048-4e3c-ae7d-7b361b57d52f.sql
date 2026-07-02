@@ -1,0 +1,3 @@
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'ads';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'finance';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'gst';

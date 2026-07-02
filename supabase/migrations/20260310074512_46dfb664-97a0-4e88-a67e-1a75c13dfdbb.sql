@@ -1,0 +1,2 @@
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS meta_fbc text DEFAULT NULL;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS meta_fbp text DEFAULT NULL;

@@ -1,0 +1,1 @@
+UPDATE companies SET meta_pixel_id = '2138604833617582' WHERE slug = 'fundcera';
