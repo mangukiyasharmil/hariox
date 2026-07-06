@@ -25,10 +25,9 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
     email: "",
     phone: "",
     city: "",
-    loan_type: "personal" as LoanType,
-    loan_amount: "",
-    employment_type: "salaried" as EmploymentType,
-    monthly_income: "",
+    product_category: "personal" as LoanType, // Map to loan_type enum
+    order_value: "129",                       // Map to loan_amount numeric
+    shopify_order_id: "",                     // Map to application_id text
     status: "unpaid" as LeadStatus,
     source: "manual",
   });
@@ -45,19 +44,20 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
           full_name: formData.full_name,
           email: formData.email,
           city: formData.city || "N/A",
-          loan_type: formData.loan_type,
-          loan_amount: Number(formData.loan_amount) || 1,
-          employment_type: formData.employment_type,
-          monthly_income: Number(formData.monthly_income) || 1,
+          loan_type: formData.product_category,
+          loan_amount: Number(formData.order_value) || 129,
+          application_id: formData.shopify_order_id || null, // Shopify Order ID
+          employment_type: "salaried", // default dummy
+          monthly_income: 0,           // default dummy
           source: formData.source || "manual",
           company_id: currentCompany?.id,
         },
       });
 
       if (error) throw error;
-      if (data && !data.success) throw new Error(data.error || "Failed to create lead");
+      if (data && !data.success) throw new Error(data.error || "Failed to create customer");
       
-      toast.success("Lead created successfully");
+      toast.success("Customer created successfully");
       onSuccess();
       onClose();
       // Reset form
@@ -66,16 +66,15 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
         email: "",
         phone: "",
         city: "",
-        loan_type: "personal",
-        loan_amount: "",
-        employment_type: "salaried",
-        monthly_income: "",
+        product_category: "personal",
+        order_value: "129",
+        shopify_order_id: "",
         status: "unpaid",
         source: "manual",
       });
     } catch (error) {
-      console.error("Error creating lead:", error);
-      toast.error("Failed to create lead");
+      console.error("Error creating customer:", error);
+      toast.error("Failed to create customer");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,7 +84,7 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Lead Manually</DialogTitle>
+          <DialogTitle>Add Customer Manually</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -133,53 +132,36 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
             </div>
             
             <div>
-              <Label>Loan Type</Label>
-              <Select value={formData.loan_type} onValueChange={(v) => setFormData({ ...formData, loan_type: v as LoanType })}>
+              <Label>Product Category</Label>
+              <Select value={formData.product_category} onValueChange={(v) => setFormData({ ...formData, product_category: v as LoanType })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="personal">Personal</SelectItem>
-                  <SelectItem value="business">Business</SelectItem>
-                  <SelectItem value="home">Home</SelectItem>
-                  <SelectItem value="education">Education</SelectItem>
-                  <SelectItem value="vehicle">Vehicle</SelectItem>
-                  <SelectItem value="gold">Gold</SelectItem>
-                  <SelectItem value="marriage">Marriage</SelectItem>
+                  <SelectItem value="personal">Hariox Light Blue ($129)</SelectItem>
+                  <SelectItem value="business">Pro Bundle ($129)</SelectItem>
+                  <SelectItem value="marriage">Custom Branding ($129)</SelectItem>
+                  <SelectItem value="home">Starter Pack ($129)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div>
-              <Label>Loan Amount *</Label>
+              <Label>Order Value ($) *</Label>
               <Input 
                 required
                 type="number"
-                value={formData.loan_amount}
-                onChange={(e) => setFormData({ ...formData, loan_amount: e.target.value })}
-                placeholder="₹0"
+                value={formData.order_value}
+                onChange={(e) => setFormData({ ...formData, order_value: e.target.value })}
+                placeholder="$129"
               />
             </div>
             
             <div>
-              <Label>Monthly Income *</Label>
+              <Label>Shopify Order ID</Label>
               <Input 
-                required
-                type="number"
-                value={formData.monthly_income}
-                onChange={(e) => setFormData({ ...formData, monthly_income: e.target.value })}
-                placeholder="₹0"
+                value={formData.shopify_order_id}
+                onChange={(e) => setFormData({ ...formData, shopify_order_id: e.target.value })}
+                placeholder="e.g. #1024"
               />
-            </div>
-            
-            <div>
-              <Label>Employment</Label>
-              <Select value={formData.employment_type} onValueChange={(v) => setFormData({ ...formData, employment_type: v as EmploymentType })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="salaried">Salaried</SelectItem>
-                  <SelectItem value="self_employed">Self Employed</SelectItem>
-                  <SelectItem value="business_owner">Business Owner</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             
             <div>
@@ -187,22 +169,21 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
               <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v as LeadStatus })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="unpaid">Unpaid</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="verification">Verification</SelectItem>
+                  <SelectItem value="unpaid">Pending Lead</SelectItem>
+                  <SelectItem value="paid">Active Customer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
-            <div>
+            <div className="col-span-2">
               <Label>Source</Label>
               <Select value={formData.source} onValueChange={(v) => setFormData({ ...formData, source: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="manual">Manual Entry</SelectItem>
                   <SelectItem value="website">Website</SelectItem>
-                  <SelectItem value="marketing">Marketing</SelectItem>
-                  <SelectItem value="referral">Referral</SelectItem>
+                  <SelectItem value="shopify">Shopify Store</SelectItem>
+                  <SelectItem value="marketing">Marketing Campaign</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -212,7 +193,7 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
             <Button type="submit" variant="hero" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Create Lead
+              Create Customer
             </Button>
           </DialogFooter>
         </form>

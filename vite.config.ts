@@ -24,27 +24,6 @@ export default defineConfig(({ mode }) => ({
     cssCodeSplit: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Core React + Router
-          "vendor-react": ["react", "react-dom", "react-router-dom"],
-          // UI library
-          "vendor-ui": [
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-toast",
-            "@radix-ui/react-tooltip",
-            "@radix-ui/react-select",
-            "@radix-ui/react-popover",
-            "@radix-ui/react-accordion",
-          ],
-          // Data & state
-          "vendor-data": ["@tanstack/react-query", "@supabase/supabase-js"],
-          // Charts (heavy, only needed in admin)
-          "vendor-charts": ["recharts"],
-          // Animation
-          "vendor-motion": ["framer-motion"],
-        },
       },
     },
   },

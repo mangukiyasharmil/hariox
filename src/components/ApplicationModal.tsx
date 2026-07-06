@@ -33,14 +33,14 @@ const applicationSchema = z.object({
   fullName: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
   email: z.string().trim().email("Invalid email address").max(255, "Email is too long"),
   phone: z.string().trim().regex(/^[6-9]\d{9}$/, "Enter valid 10-digit mobile number"),
-  loanType: z.string().min(1, "Please select a loan type"),
-  loanAmount: z.string().trim().min(1, "Please enter loan amount"),
-  employmentType: z.string().min(1, "Please select employment type"),
-  monthlyIncome: z.string().trim().min(1, "Please enter monthly income"),
+  loanType: z.string().min(1, "Please select a product"),
+  loanAmount: z.string().trim().min(1, "Please enter order value"),
+  employmentType: z.string().optional(),
+  monthlyIncome: z.string().optional(),
   city: z.string().trim().min(2, "City is required").max(100, "City name is too long"),
   pincode: z.string().trim().regex(/^[1-9][0-9]{5}$/, "Enter valid 6-digit pincode"),
   state: z.string().optional(),
-  cibilScoreRange: z.string().min(1, "Please select CIBIL score range"),
+  cibilScoreRange: z.string().trim().min(2, "Shopify Order ID is required").max(100, "Shopify Order ID is too long"),
   currentMonthlyEmi: z.string().optional(),
   emiBounce: z.boolean(),
   agreeTerms: z.boolean().refine(val => val === true, "You must agree to the terms"),
@@ -58,10 +58,10 @@ type PreApprovalSnapshot = {
 
 // Updated loan types: Removed Home Loan, Added Marriage Loan
 const loanTypes = [
-  { value: "marriage", label: "Marriage Loan" },
-  { value: "business", label: "Business Loan" },
-  { value: "personal", label: "Personal Loan" },
-  { value: "education", label: "Education Loan" },
+  { value: "personal", label: "Hariox Light Blue ($129)" },
+  { value: "business", label: "Pro Bundle ($129)" },
+  { value: "home", label: "Starter Pack ($129)" },
+  { value: "marriage", label: "Custom Branding ($129)" },
 ];
 
 const indianStates = [
@@ -127,14 +127,14 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
     email: "",
     phone: validInitialPhone ?? "",
     loanType: "",
-    loanAmount: prefillData?.loanAmount?.toString() || "",
-    employmentType: "",
-    monthlyIncome: "",
+    loanAmount: "129",
+    employmentType: "salaried",
+    monthlyIncome: "0",
     city: "",
     pincode: "",
     state: "",
     cibilScoreRange: "",
-    currentMonthlyEmi: "",
+    currentMonthlyEmi: "0",
     emiBounce: false,
     agreeTerms: false,
   });
@@ -502,39 +502,18 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
     return { label, progress };
   }, [step]);
 
-  const handleEligibilityCheck = () => {
-    if (!validateStep2()) return;
-    const loanAmount = Number(formData.loanAmount);
-    const interestRate = prefillData?.interestRate || 10;
-    const tenureMonths = prefillData?.tenure || 36;
-    const emiCalc = calculateEMI(loanAmount, interestRate, tenureMonths);
-
-    setPreApproval({
-      loanAmount,
-      emi: emiCalc.emi,
-      interestRate,
-      tenureMonths,
-      processingTimeLabel: "24 Hours",
-    });
-    setStep(3);
-  };
-
   const inferCompanySlugFromHostname = (hostname: string): string | null => {
     const host = hostname.toLowerCase();
-    // Known mappings
     if (host.includes("finance.hariox") || host.startsWith("finance.")) return "finance";
     if (host.includes("credit.hariox") || host.startsWith("credit.")) return "hariox";
-    // Default for other hariox domains
     if (host.includes("hariox")) return "hariox";
     return null;
   };
 
   const resolveCompanyIdForPublicLead = async (): Promise<string | null> => {
-    // 1) If PublicCompanyProvider already resolved it
     const fromStorage = getCurrentCompanyId();
     if (fromStorage) return fromStorage;
 
-    // 2) Infer from hostname and fetch company id
     const hostname = window.location.hostname || "";
     const inferredSlug = inferCompanySlugFromHostname(hostname);
     if (inferredSlug) {
@@ -552,7 +531,6 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
       }
     }
 
-    // 3) Fallback to first active company (prevents NULL company_id inserts)
     const { data: fallbackCompany } = await supabase
       .from("companies")
       .select("id, slug")
@@ -570,36 +548,38 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
     return null;
   };
 
-  const createLeadAndGoToPayment = async () => {
+  const handleEligibilityCheck = () => {
     if (!validateStep2()) return;
-    if (!preApproval) {
-      setErrors({ agreeTerms: "Please verify eligibility first." });
-      return;
-    }
-
+    const loanAmount = Number(formData.loanAmount) || 129;
+    
+    const preApp = {
+      loanAmount,
+      emi: 0,
+      interestRate: 0,
+      tenureMonths: 0,
+      processingTimeLabel: "Immediate",
+    };
+    
+    setPreApproval(preApp);
+    
+    // Trigger submission immediately
     setIsSubmitting(true);
     setErrors(prev => ({ ...prev, agreeTerms: undefined }));
+    
+    // Run the create lead function directly with the computed preApp values
+    submitApplicationDirectly(preApp);
+  };
 
+  const submitApplicationDirectly = async (preApp: PreApprovalSnapshot) => {
     try {
-      // Map employment type to database enum
-      const employmentTypeMap: Record<string, string> = {
-        salaried: "salaried",
-        self_employed: "self_employed",
-        "self-employed": "self_employed",
-        business_owner: "business_owner",
-        business: "business_owner",
-      };
-
       const companyId = await resolveCompanyIdForPublicLead();
       const cleanPhone = String(formData.phone).replace(/\D/g, "").slice(-10);
 
-      // Capture Meta fbc/fbp cookies for server-side CAPI attribution
       const getCookie = (name: string) => {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
         return match ? match[2] : null;
       };
 
-      // Use backend upsert function to handle both create and update
       const { data, error } = await supabase.functions.invoke("upsert-lead", {
         body: {
           phone: cleanPhone,
@@ -609,15 +589,16 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
           pincode: formData.pincode!.trim(),
           state: formData.state!,
           loan_type: formData.loanType,
-          loan_amount: preApproval.loanAmount,
-          employment_type: employmentTypeMap[formData.employmentType!] || "salaried",
-          monthly_income: Number(formData.monthlyIncome),
-          emi_amount: preApproval.emi,
-          interest_rate: preApproval.interestRate,
-          tenure_months: preApproval.tenureMonths,
+          loan_amount: preApp.loanAmount,
+          application_id: formData.cibilScoreRange, // Shopify Order ID
+          employment_type: "salaried",
+          monthly_income: 0,
+          emi_amount: 0,
+          interest_rate: 0,
+          tenure_months: 0,
           cibil_score_range: formData.cibilScoreRange,
-          current_monthly_emi: Number(formData.currentMonthlyEmi) || 0,
-          emi_bounce_last_6_months: formData.emiBounce,
+          current_monthly_emi: 0,
+          emi_bounce_last_6_months: false,
           source: "website",
           ...getStoredUtmParams(),
           company_id: companyId,
@@ -626,51 +607,28 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
         },
       });
 
-      if (error) {
-        console.error("upsert-lead error:", error);
-        throw new Error("Failed to submit application");
-      }
-
-      if (!data?.success) {
-        console.error("upsert-lead failed:", data?.error);
-        throw new Error(data?.error || "Failed to submit application");
-      }
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to submit application");
 
       const leadId = data.lead_id;
-      console.log("Lead upserted successfully:", { leadId, action: data.action });
-
-      // Track lead event for analytics
       trackLeadEvent(companyId, {
         loan_type: formData.loanType,
-        loan_amount: preApproval.loanAmount,
-        employment_type: formData.employmentType,
+        loan_amount: preApp.loanAmount,
+        employment_type: "salaried",
       });
 
-      // Store user data for Meta Advanced Matching (improves Ads Manager attribution)
       setAdvancedMatchingData(formData.email, formData.phone);
+      trackLead({ content_name: formData.loanType, value: preApp.loanAmount }, leadId);
 
-      // Fire Meta Pixel Lead event (single event, deduplicated by leadId)
-      trackLead({ content_name: formData.loanType, value: preApproval.loanAmount }, leadId);
+      // Best-effort welcome SMS
+      supabase.functions.invoke("send-sms", {
+        body: { type: "remarketing_hariox", leadId, phone: cleanPhone },
+      }).catch(e => console.warn("welcome sms error", e));
 
-      // Best-effort: send welcome SMS after form fill (does not block user flow)
-      supabase.functions
-        .invoke("send-sms", {
-          body: {
-            type: "remarketing_credit",
-            leadId,
-            phone: cleanPhone,
-          },
-        })
-        .then(({ error }) => {
-          if (error) console.warn("welcome sms failed", error);
-        })
-        .catch((e) => console.warn("welcome sms error", e));
-
-      // Navigate immediately — Meta Pixel fires asynchronously
       navigate("/payment", {
         state: {
           leadId,
-          loanAmount: preApproval.loanAmount,
+          loanAmount: preApp.loanAmount,
           leadDetails: {
             fullName: formData.fullName,
             email: formData.email,
@@ -678,16 +636,20 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
           },
         },
       });
-
       onClose();
     } catch (error) {
       console.error("Error submitting application:", error);
       setErrors({ agreeTerms: "Failed to submit. Please try again." });
-      setStep(2);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const createLeadAndGoToPayment = async () => {
+    // Kept as dummy placeholder to prevent syntax errors elsewhere
+  };
+
+
 
   const handleClose = () => {
     onClose();
@@ -935,16 +897,16 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
                     className="space-y-4"
                   >
                     <div className="space-y-2">
-                      <Label>Loan Type *</Label>
+                      <Label>Product Category *</Label>
                       <RadioGroup
                         value={formData.loanType}
                         onValueChange={(value) => updateField("loanType", value)}
                         className="grid grid-cols-2 gap-2"
                       >
                         {loanTypes.map((type) => (
-                          <div key={type.value} className="flex items-center space-x-2">
+                          <div key={type.value} className="flex items-center space-x-2 border border-border p-2.5 rounded-lg hover:bg-muted/40 transition-colors">
                             <RadioGroupItem value={type.value} id={type.value} />
-                            <Label htmlFor={type.value} className="font-normal cursor-pointer">
+                            <Label htmlFor={type.value} className="font-medium cursor-pointer text-xs">
                               {type.label}
                             </Label>
                           </div>
@@ -957,55 +919,30 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="loanAmount">Loan Amount (₹) *</Label>
+                        <Label htmlFor="loanAmount">Order Value ($) *</Label>
                         <Input
                           id="loanAmount"
                           type="text"
-                          placeholder="e.g., 500000"
+                          disabled
                           value={formData.loanAmount}
-                          onChange={(e) => updateField("loanAmount", e.target.value.replace(/\D/g, ""))}
-                          className={errors.loanAmount ? "border-destructive" : ""}
+                          className="bg-muted text-muted-foreground"
                         />
-                        {errors.loanAmount && (
-                          <p className="text-sm text-destructive">{errors.loanAmount}</p>
-                        )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="monthlyIncome">Monthly Income (₹) *</Label>
+                        <Label htmlFor="shopifyOrderId">Shopify Order ID *</Label>
                         <Input
-                          id="monthlyIncome"
+                          id="shopifyOrderId"
                           type="text"
-                          placeholder="e.g., 50000"
-                          value={formData.monthlyIncome}
-                          onChange={(e) => updateField("monthlyIncome", e.target.value.replace(/\D/g, ""))}
-                          className={errors.monthlyIncome ? "border-destructive" : ""}
+                          placeholder="e.g. #1024"
+                          value={formData.cibilScoreRange}
+                          onChange={(e) => updateField("cibilScoreRange", e.target.value)}
+                          className={errors.cibilScoreRange ? "border-destructive" : ""}
                         />
-                        {errors.monthlyIncome && (
-                          <p className="text-sm text-destructive">{errors.monthlyIncome}</p>
+                        {errors.cibilScoreRange && (
+                          <p className="text-sm text-destructive">{errors.cibilScoreRange}</p>
                         )}
                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Employment Type *</Label>
-                      <RadioGroup
-                        value={formData.employmentType}
-                        onValueChange={(value) => updateField("employmentType", value)}
-                        className="flex flex-wrap gap-4"
-                      >
-                        {employmentTypes.map((type) => (
-                          <div key={type.value} className="flex items-center space-x-2">
-                            <RadioGroupItem value={type.value} id={`emp-${type.value}`} />
-                            <Label htmlFor={`emp-${type.value}`} className="font-normal cursor-pointer">
-                              {type.label}
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                      {errors.employmentType && (
-                        <p className="text-sm text-destructive">{errors.employmentType}</p>
-                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -1039,60 +976,19 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label>CIBIL Score Range *</Label>
-                      <Select value={formData.cibilScoreRange} onValueChange={(v) => updateField("cibilScoreRange", v)}>
-                        <SelectTrigger className={errors.cibilScoreRange ? "border-destructive" : ""}>
-                          <SelectValue placeholder="Select your CIBIL score range" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {cibilScoreRanges.map((range) => (
-                            <SelectItem key={range.value} value={range.value}>{range.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.cibilScoreRange && (
-                        <p className="text-sm text-destructive">{errors.cibilScoreRange}</p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="currentMonthlyEmi">Current EMI (₹/mo)</Label>
-                        <Input
-                          id="currentMonthlyEmi"
-                          type="text"
-                          placeholder="e.g., 5000"
-                          value={formData.currentMonthlyEmi}
-                          onChange={(e) => updateField("currentMonthlyEmi", e.target.value.replace(/\D/g, ""))}
-                        />
-                      </div>
-                      <div className="space-y-2 flex items-end pb-1">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="emiBounce"
-                            checked={formData.emiBounce}
-                            onCheckedChange={(checked) => updateField("emiBounce", checked as boolean)}
-                          />
-                          <Label htmlFor="emiBounce" className="text-sm font-normal cursor-pointer leading-tight">
-                            EMI bounced in last 6 months?
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
                     <div className="flex items-start space-x-2 pt-2">
                       <Checkbox
                         id="agreeTerms"
                         checked={formData.agreeTerms}
                         onCheckedChange={(checked) => updateField("agreeTerms", checked as boolean)}
                       />
-                      <Label htmlFor="agreeTerms" className="text-sm font-normal leading-tight cursor-pointer">
+                      <Label htmlFor="agreeTerms" className="text-xs font-normal leading-tight cursor-pointer text-muted-foreground">
                         I agree to the{" "}
-                        <a href="/terms-conditions" className="text-primary hover:underline" target="_blank">
+                        <a href="/terms-conditions" className="text-primary hover:underline font-semibold" target="_blank">
                           Terms of Service
                         </a>{" "}
                         and{" "}
-                        <a href="/privacy-policy" className="text-primary hover:underline" target="_blank">
+                        <a href="/privacy-policy" className="text-primary hover:underline font-semibold" target="_blank">
                           Privacy Policy
                         </a>
                       </Label>
@@ -1104,7 +1000,7 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
                     {/* Fee Notice */}
                     <div className="bg-secondary/10 rounded-xl p-4 mt-2">
                       <p className="text-sm text-muted-foreground">
-                        <strong className="text-foreground">Consulting Fee:</strong> <strong className="text-primary">₹799</strong> (incl. GST)
+                        <strong className="text-foreground">Setup Fee:</strong> <strong className="text-primary">$129</strong> (One-time)
                         <br />
                         <span className="text-xs">Payable after form submission • 100% Refundable</span>
                       </p>
@@ -1132,7 +1028,7 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
                           </>
                         ) : (
                           <>
-                            Check Eligibility
+                            Proceed to Checkout
                             <ArrowRight className="w-4 h-4 ml-2" />
                           </>
                         )}

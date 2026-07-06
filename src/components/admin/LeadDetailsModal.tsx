@@ -285,7 +285,7 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
   const handleCall = () => window.open(`tel:+91${formData.phone}`, "_self");
 
   const handleWhatsApp = () => {
-    const message = `Hello ${formData.full_name}, we received your loan application and would like to assist you.`;
+    const message = `Hello ${formData.full_name}, we received your order request from Hariox and would like to assist you.`;
     window.open(`https://wa.me/91${formData.phone}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -302,10 +302,7 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
           state: formData.state || null,
           loan_type: formData.loan_type,
           loan_amount: formData.loan_amount,
-          employment_type: formData.employment_type,
-          monthly_income: formData.monthly_income,
-          current_monthly_emi: formData.current_monthly_emi ?? null,
-          cibil_score_range: formData.cibil_score_range || null,
+          application_id: formData.application_id || null,
           status: formData.status,
           assigned_to: formData.assigned_to || null,
         })
@@ -475,37 +472,25 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm text-muted-foreground">Loan Information</h3>
+                  <h3 className="font-semibold text-sm text-muted-foreground">Product &amp; Shopify Details</h3>
                   <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label>User Type</Label>
-                        <select
-                          className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                          value={formData.employment_type || "salaried"}
-                          onChange={(e) => setFormData({ ...formData, employment_type: e.target.value as Lead["employment_type"] })}
-                        >
-                          <option value="salaried">Salaried</option>
-                          <option value="self_employed">Self-Employed</option>
-                          <option value="business_owner">Business Owner</option>
-                        </select>
-                      </div>
-                      <div>
-                        <Label>Loan Purpose</Label>
-                        <select
-                          className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm capitalize"
-                          value={formData.loan_type || "personal"}
-                          onChange={(e) => setFormData({ ...formData, loan_type: e.target.value as Lead["loan_type"] })}
-                        >
-                          {["home", "business", "personal", "education", "vehicle", "gold"].map((t) => (
-                            <option key={t} value={t} className="capitalize">{t} Loan</option>
-                          ))}
-                        </select>
-                      </div>
+                    <div>
+                      <Label>Product Category</Label>
+                      <select
+                        className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm capitalize font-medium"
+                        value={formData.loan_type || "personal"}
+                        onChange={(e) => setFormData({ ...formData, loan_type: e.target.value as Lead["loan_type"] })}
+                      >
+                        <option value="personal">Hariox Light Blue ($129)</option>
+                        <option value="business">Pro Bundle ($129)</option>
+                        <option value="home">Starter Pack ($129)</option>
+                        <option value="marriage">Custom Branding ($129)</option>
+                      </select>
                     </div>
+                    
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label>Loan Amount</Label>
+                        <Label>Order Value ($)</Label>
                         <Input
                           type="number"
                           value={formData.loan_amount || ""}
@@ -513,37 +498,11 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
                         />
                       </div>
                       <div>
-                        <Label>CIBIL Score</Label>
-                        <select
-                          className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                          value={(formData as any).cibil_score_range || ""}
-                          onChange={(e) => setFormData({ ...formData, cibil_score_range: e.target.value } as any)}
-                        >
-                          <option value="">Select Range</option>
-                          <option value="750+">750+ (Excellent)</option>
-                          <option value="650-750">650-750 (Good)</option>
-                          <option value="550-650">550-650 (Fair)</option>
-                          <option value="below-550">Below 550 (Poor)</option>
-                          <option value="no-credit">No Credit History</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label>Monthly Income</Label>
+                        <Label>Shopify Order ID</Label>
                         <Input
-                          type="number"
-                          value={formData.monthly_income || ""}
-                          onChange={(e) => setFormData({ ...formData, monthly_income: Number(e.target.value) })}
-                        />
-                      </div>
-                      <div>
-                        <Label>Monthly EMI</Label>
-                        <Input
-                          type="number"
-                          value={(formData as any).current_monthly_emi ?? ""}
-                          onChange={(e) => setFormData({ ...formData, current_monthly_emi: e.target.value ? Number(e.target.value) : null })}
-                          placeholder="Monthly EMI"
+                          value={formData.application_id || ""}
+                          onChange={(e) => setFormData({ ...formData, application_id: e.target.value })}
+                          placeholder="e.g. #1024"
                         />
                       </div>
                     </div>

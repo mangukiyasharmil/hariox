@@ -289,25 +289,29 @@ const LeadsManagement = () => {
     }
 
     // CSV header
-    let csv = "Lead Export - " + (currentCompany?.name || "All Companies") + "\n";
+    let csv = "Customer Export - " + (currentCompany?.name || "All Companies") + "\n";
     csv += "Generated: " + new Date().toLocaleString("en-IN") + "\n\n";
-    csv += "Full Name,Email,Phone,City,State,Loan Type,Loan Amount,Employment Type,Monthly Income,Status,Source,CIBIL Score,Assigned To,Created At\n";
+    csv += "Full Name,Email,Phone,City,State,Product,Order Value,Shopify Order ID,Status,Source,Assigned To,Created At\n";
 
     // CSV rows
     filteredLeads.forEach((lead) => {
+      const productLabel = lead.loan_type === 'personal' ? 'Hariox Light Blue' 
+        : lead.loan_type === 'business' ? 'Pro Bundle' 
+        : lead.loan_type === 'home' ? 'Starter Pack' 
+        : lead.loan_type === 'marriage' ? 'Custom Branding' 
+        : lead.loan_type;
+
       const row = [
         `"${lead.full_name || ""}"`,
         `"${lead.email || ""}"`,
         `"${lead.phone || ""}"`,
         `"${lead.city || ""}"`,
         `"${lead.state || ""}"`,
-        `"${lead.loan_type || ""}"`,
-        lead.loan_amount || 0,
-        `"${lead.employment_type?.replace(/_/g, " ") || ""}"`,
-        lead.monthly_income || 0,
-        `"${lead.status?.replace(/_/g, " ") || ""}"`,
+        `"${productLabel || ""}"`,
+        `$${lead.loan_amount || 129}`,
+        `"${lead.application_id || ""}"`,
+        `"${lead.status === 'unpaid' ? 'Pending Lead' : lead.status === 'paid' ? 'Active Customer' : lead.status?.replace(/_/g, " ") || ""}"`,
         `"${formatLeadSource(lead.source)}"`,
-        `"${lead.cibil_score_range || ""}"`,
         `"${lead.assignedStaffName || "Unassigned"}"`,
         `"${new Date(lead.created_at).toLocaleString("en-IN")}"`,
       ];
@@ -318,11 +322,11 @@ const LeadsManagement = () => {
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `leads-export-${new Date().toISOString().split("T")[0]}.csv`;
+    link.download = `customers-export-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
     
-    toast.success(`Exported ${filteredLeads.length} leads`);
+    toast.success(`Exported ${filteredLeads.length} customers`);
   };
 
   const filteredLeads = leads.filter((lead) => {
@@ -353,30 +357,45 @@ const LeadsManagement = () => {
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       unpaid: "bg-yellow-100 text-yellow-800",
-      paid: "bg-blue-100 text-blue-800",
+      paid: "bg-green-100 text-green-800",
       verification: "bg-purple-100 text-purple-800",
       documents_pending: "bg-orange-100 text-orange-800",
       documents_uploaded: "bg-cyan-100 text-cyan-800",
-      verified: "bg-green-100 text-green-800",
+      verified: "bg-emerald-100 text-emerald-800",
       rejected: "bg-red-100 text-red-800",
       processing: "bg-indigo-100 text-indigo-800",
-      approved: "bg-emerald-100 text-emerald-800",
-      disbursed: "bg-teal-100 text-teal-800",
+      approved: "bg-teal-100 text-teal-800",
+      disbursed: "bg-blue-100 text-blue-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      unpaid: "Pending Lead",
+      paid: "Active Customer",
+      verification: "Verification",
+      documents_pending: "Docs Pending",
+      documents_uploaded: "Docs Uploaded",
+      verified: "Verified",
+      rejected: "Rejected",
+      processing: "Processing",
+      approved: "Approved",
+      disbursed: "Onboarded",
+    };
+    return labels[status] || status.replace(/_/g, " ");
   };
 
   // Simplified status groupings for easier filtering
   const statusGroups = [
     { value: "all", label: "All Status" },
-    { value: "unpaid", label: "Unpaid" },
-    { value: "paid", label: "Paid" },
-    { value: "docs", label: "Docs Pending" }, // Combines verification, documents_pending, documents_uploaded
+    { value: "unpaid", label: "Pending Leads" },
+    { value: "paid", label: "Active Customers" },
+    { value: "docs", label: "Onboarding Pending" }, 
     { value: "verified", label: "Verified" },
-    { value: "processing", label: "Processing" }, // Combines processing, approved
-    { value: "disbursed", label: "Disbursed" },
+    { value: "processing", label: "Processing" }, 
+    { value: "disbursed", label: "Onboarded" },
     { value: "rejected", label: "Rejected" },
-    { value: "lost", label: "Lost" },
   ];
 
   const statuses = ["all", "unpaid", "paid", "verification", "documents_pending", "documents_uploaded", "verified", "rejected", "processing", "approved", "disbursed"];
@@ -500,11 +519,16 @@ const LeadsManagement = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="capitalize">{lead.loan_type} • ₹{Number(lead.loan_amount).toLocaleString("en-IN")}</span>
+                <span className="capitalize">
+                  {(lead.loan_type === 'personal' ? 'Hariox Light Blue' : lead.loan_type === 'business' ? 'Pro Bundle' : lead.loan_type === 'home' ? 'Starter Pack' : lead.loan_type === 'marriage' ? 'Custom Branding' : lead.loan_type)} • ${lead.loan_amount || 129}
+                </span>
                 <span>{new Date(lead.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground">{lead.assignedStaffName || "Unassigned"} • {formatLeadSource(lead.source)}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {lead.assignedStaffName || "Unassigned"} • {formatLeadSource(lead.source)}
+                  {lead.application_id && ` • Shopify: ${lead.application_id}`}
+                </span>
                 <div className="flex gap-0.5">
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCall(lead.phone)}><Phone className="w-3.5 h-3.5" /></Button>
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleWhatsApp(lead.phone, lead.full_name)}><WhatsAppIcon size="sm" className="text-[#25D366]" /></Button>
@@ -532,7 +556,7 @@ const LeadsManagement = () => {
                   </button>
                 </th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Customer</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Loan Details</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Product Details</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Status</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Source</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Assigned To</th>
@@ -562,18 +586,19 @@ const LeadsManagement = () => {
                       <p className="text-xs text-muted-foreground">{lead.email}</p>
                       <p className="text-xs text-muted-foreground">{lead.phone?.replace(/\D/g, "").slice(-10)}</p>
                       <p className="text-xs text-muted-foreground">{lead.city}{lead.state ? `, ${lead.state}` : ""}</p>
-                      {lead.cibil_score_range && (
-                        <p className="text-xs text-blue-600">CIBIL: {lead.cibil_score_range}</p>
+                    </td>
+                    <td className="p-4">
+                      <p className="font-medium capitalize">
+                        {(lead.loan_type === 'personal' ? 'Hariox Light Blue' : lead.loan_type === 'business' ? 'Pro Bundle' : lead.loan_type === 'home' ? 'Starter Pack' : lead.loan_type === 'marriage' ? 'Custom Branding' : lead.loan_type)}
+                      </p>
+                      <p className="text-sm font-semibold text-primary">${lead.loan_amount || 129}</p>
+                      {lead.application_id && (
+                        <p className="text-xs text-blue-600 font-semibold">Shopify ID: {lead.application_id}</p>
                       )}
                     </td>
                     <td className="p-4">
-                      <p className="font-medium capitalize">{lead.loan_type} Loan</p>
-                      <p className="text-sm">₹{Number(lead.loan_amount).toLocaleString("en-IN")}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{lead.employment_type?.replace(/_/g, " ")}</p>
-                    </td>
-                    <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(lead.status)}`}>
-                        {lead.status.replace(/_/g, " ")}
+                        {getStatusLabel(lead.status)}
                       </span>
                     </td>
                     <td className="p-4 text-muted-foreground text-xs">{formatLeadSource(lead.source)}</td>

@@ -53,55 +53,21 @@ export const PublicCompanyProvider = ({ children, slug }: PublicCompanyProviderP
 
   const fetchCompany = async () => {
     try {
-      const hostname = window.location.hostname.toLowerCase();
-      let companySlug = slug;
-      let foundByCustomDomain = false;
-      
-      if (!companySlug) {
-        // 0. Check pathname for /c/:slug or /:slug/admin
-        const pathParts = window.location.pathname.split('/');
-        if (pathParts[1] === 'c' && pathParts[2]) {
-          companySlug = pathParts[2];
-        } else if (pathParts[1] && (pathParts[2] === 'admin' || pathParts[2] === 'franchise-admin')) {
-          companySlug = pathParts[1];
-        }
-        
-        // 1. Try custom domain lookup first (for SaaS clients with their own domains)
-        if (!companySlug) {
-          const { data: domainMatch } = await supabase
-            .rpc("lookup_company_by_domain", { _domain: hostname });
-          
-          if (domainMatch && domainMatch.length > 0) {
-            setCompany(domainMatch[0] as unknown as PublicCompany);
-            localStorage.setItem("publicCompanySlug", domainMatch[0].slug);
-            localStorage.setItem("publicCompanyId", domainMatch[0].id);
-            foundByCustomDomain = true;
-            setIsLoading(false);
-            return;
-          }
-        }
-        
-        // 2. Single brand: all Hariox domains resolve to slug 'hariox'
-        companySlug = 'hariox';
-      }
+      // Force single company slug 'hariox' for Hariox CRM
+      const companySlug = 'hariox';
 
-      let query = supabase
+      const { data, error } = await supabase
         .from("companies")
         .select("*")
-        .eq("is_active", true);
-
-      if (companySlug) {
-        query = query.eq("slug", companySlug);
-      }
-
-      const { data, error } = await query.order("created_at").limit(1);
+        .eq("slug", companySlug)
+        .eq("is_active", true)
+        .limit(1);
 
       if (error) throw error;
 
       if (data && data.length > 0) {
         const companyData = data[0] as PublicCompany;
         setCompany(companyData);
-        // Store for current session only
         localStorage.setItem("publicCompanySlug", companyData.slug);
         localStorage.setItem("publicCompanyId", companyData.id);
       }

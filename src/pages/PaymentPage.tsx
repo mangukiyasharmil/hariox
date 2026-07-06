@@ -59,14 +59,14 @@ interface RazorpayResponse {
   razorpay_signature: string;
 }
 
-// Individual benefit cards with accent colors — big boxes
+// Individual benefit cards adapted for Shopify e-commerce onboarding
 const benefits = [
-  { icon: FileCheck, title: "Free KYC", desc: "Document check at ₹0", accent: "from-blue-500/20 to-blue-400/5 border-blue-300/60", iconBg: "bg-blue-500/20", iconColor: "text-blue-600" },
-  { icon: Percent, title: "Best Rates", desc: "Lowest interest guaranteed", accent: "from-amber-500/20 to-amber-400/5 border-amber-300/60", iconBg: "bg-amber-500/20", iconColor: "text-amber-600" },
-  { icon: Building2, title: "30+ Banks", desc: "Max approval chances", accent: "from-emerald-500/20 to-emerald-400/5 border-emerald-300/60", iconBg: "bg-emerald-500/20", iconColor: "text-emerald-600" },
-  { icon: Zap, title: "24hr Speed", desc: "Fast-track disbursal", accent: "from-violet-500/20 to-violet-400/5 border-violet-300/60", iconBg: "bg-violet-500/20", iconColor: "text-violet-600" },
-  { icon: HeadphonesIcon, title: "Advisor", desc: "Dedicated loan manager", accent: "from-rose-500/20 to-rose-400/5 border-rose-300/60", iconBg: "bg-rose-500/20", iconColor: "text-rose-600" },
-  { icon: TrendingDown, title: "Low EMI", desc: "Reduced monthly payments", accent: "from-teal-500/20 to-teal-400/5 border-teal-300/60", iconBg: "bg-teal-500/20", iconColor: "text-teal-600" },
+  { icon: FileCheck, title: "Shopify Sync", desc: "Instant sync with your store", accent: "from-blue-500/20 to-blue-400/5 border-blue-300/60", iconBg: "bg-blue-500/20", iconColor: "text-blue-600" },
+  { icon: Percent, title: "Order Tracking", desc: "Automated fulfillment check", accent: "from-amber-500/20 to-amber-400/5 border-amber-300/60", iconBg: "bg-amber-500/20", iconColor: "text-amber-600" },
+  { icon: Building2, title: "Ready-to-Sell", desc: "Live in less than 24 hours", accent: "from-emerald-500/20 to-emerald-400/5 border-emerald-300/60", iconBg: "bg-emerald-500/20", iconColor: "text-emerald-600" },
+  { icon: Zap, title: "Fast Setup", desc: "1-click product importing", accent: "from-violet-500/20 to-violet-400/5 border-violet-300/60", iconBg: "bg-violet-500/20", iconColor: "text-violet-600" },
+  { icon: HeadphonesIcon, title: "Manager", desc: "Dedicated store assistant", accent: "from-rose-500/20 to-rose-400/5 border-rose-300/60", iconBg: "bg-rose-500/20", iconColor: "text-rose-600" },
+  { icon: TrendingDown, title: "SSL Security", desc: "100% encrypted connections", accent: "from-teal-500/20 to-teal-400/5 border-teal-300/60", iconBg: "bg-teal-500/20", iconColor: "text-teal-600" },
 ];
 
 const PaymentPage = () => {
@@ -375,7 +375,7 @@ const PaymentPage = () => {
       amount: orderData.amount * 100,
       currency: "INR",
       name: companyName,
-      description: "Loan Consultation Fee",
+      description: "Hariox Shopify Onboarding Fee",
       order_id: orderData.orderId,
       prefill: {
         name: orderData.leadDetails.name,
@@ -385,8 +385,8 @@ const PaymentPage = () => {
       theme: { color: themeColor },
       handler: async (response: RazorpayResponse) => {
         try {
-          // 🔥 Fire Purchase pixel IMMEDIATELY — before verify/navigate (fbq already loaded)
-          firePurchasePixel(orderData?.breakdown.totalAmount || (isCapital ? 471 : 799), response.razorpay_order_id);
+          // 🔥 Fire Purchase pixel IMMEDIATELY
+          firePurchasePixel(129, response.razorpay_order_id);
 
           const { error: verifyError } = await supabase.functions.invoke("verify-razorpay-payment", {
             body: {
@@ -398,7 +398,7 @@ const PaymentPage = () => {
           });
           if (verifyError) throw verifyError;
           navigate("/payment/success", {
-            state: { amount: orderData?.breakdown.totalAmount || (isCapital ? 471 : 799), orderId: response.razorpay_order_id, paymentConfirmed: true },
+            state: { amount: 129, orderId: response.razorpay_order_id, paymentConfirmed: true },
           });
         } catch (err) {
           console.error("Verification error:", err);
@@ -425,9 +425,9 @@ const PaymentPage = () => {
     handleRazorpayPayment();
   };
 
-  const displayAmount = orderData?.breakdown.totalAmount ?? (isCapital ? 471 : 799);
-  const displayFee = orderData?.breakdown.consultingFee ?? (isCapital ? 399 : 677);
-  const displayGst = orderData?.breakdown.gstAmount ?? (isCapital ? 72 : 122);
+  const displayAmount = 129;
+  const displayFee = 129;
+  const displayGst = 0;
 
   return (
     <div className="h-[100dvh] bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex flex-col overflow-hidden">
@@ -481,41 +481,37 @@ const PaymentPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-primary via-primary to-secondary rounded-xl p-2.5 text-primary-foreground"
+          className="bg-gradient-to-br from-primary via-primary to-secondary rounded-xl p-2.5 text-primary-foreground animate-pulse"
         >
           <div className="flex items-center justify-between">
             <h1 className="text-sm font-bold">
               🎉 Congrats {leadDetails?.fullName?.split(' ')[0] || 'User'}!
             </h1>
-            <div className="flex items-center gap-1 text-[10px] opacity-90">
-              <Clock className="w-3 h-3" />
-              24hr Disbursal
+            <div className="flex items-center gap-1 text-[10px] opacity-90 font-semibold bg-white/20 px-2 py-0.5 rounded-full">
+              <Clock className="w-3 h-3 animate-spin" />
+              Onboarding Ready
             </div>
           </div>
           <p className="text-[11px] opacity-90 mt-0.5">
-            {loanAmount > 0 ? (
-              <>Your loan of <strong>₹{loanAmount.toLocaleString('en-IN')}</strong> is pre-approved!</>
-            ) : (
-              <>Your loan application is pre-approved!</>
-            )}
+            Your store setup request has been pre-approved. Pay the setup fee to connect your Shopify store and begin sync!
           </p>
         </motion.div>
 
         {/* Social proof bar — live counter + scarcity */}
         <div className="flex items-center justify-between my-1.5 gap-2">
           <LiveCustomerCounter
-            variant={isCapital ? "capital" : "credit"}
+            variant="credit"
             className="!px-2 !py-1 scale-[0.85] origin-left"
           />
           <div className="flex items-center gap-1 px-2 py-1 bg-destructive/5 border border-destructive/20 rounded-full flex-shrink-0">
             <span className="text-[10px] animate-pulse">⏳</span>
-            <p className="text-[10px] font-semibold text-destructive">3 slots left</p>
+            <p className="text-[10px] font-semibold text-destructive">3 setup slots left</p>
           </div>
         </div>
 
-        {/* ₹799 Consulting Fee heading */}
+        {/* $129 Setup Fee heading */}
         <div className="text-center mb-1">
-          <p className="text-xs font-bold text-foreground">₹{isCapital ? '471' : '799'} Consulting Fee Includes</p>
+          <p className="text-xs font-bold text-foreground">$129 Store Setup Fee Includes</p>
         </div>
 
         {/* Benefits — big 2x3 cards filling space */}
@@ -546,7 +542,7 @@ const PaymentPage = () => {
           <div className="w-px h-3 bg-border" />
           <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
             <BadgeCheck className="w-3 h-3 text-emerald-600" />
-            RBI Registered
+            Shopify Verified Partner
           </div>
         </div>
 
@@ -567,20 +563,20 @@ const PaymentPage = () => {
         <div className="mt-auto pt-2 safe-area-bottom">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
-              <p className="text-base font-bold text-foreground">₹{displayAmount}</p>
-              <p className="text-[9px] text-muted-foreground">₹{displayFee} + ₹{displayGst} GST</p>
+              <p className="text-base font-bold text-foreground">${displayAmount}</p>
+              <p className="text-[9px] text-muted-foreground">One-time payment</p>
             </div>
             <Button
               variant="hero"
               size="lg"
-              className="h-11 flex-1 text-sm font-bold"
+              className="h-11 flex-1 text-sm font-bold bg-primary text-white hover:bg-primary/95 shadow-lg shadow-primary/20"
               onClick={handlePayment}
               disabled={isProcessing || isLoading || (!(usePaytm && !paytmFailed) && !usePhonePe && !orderData)}
             >
               {isProcessing || isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <>Pay ₹{displayAmount} Now →</>
+                <>Pay ${displayAmount} Now →</>
               )}
             </Button>
           </div>

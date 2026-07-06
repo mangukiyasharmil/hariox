@@ -152,11 +152,8 @@ const FinanceIndexContent = () => {
 };
 
 const FinanceIndex = () => {
-  const hostname = window.location.hostname.toLowerCase();
-  const slug = hostname.includes("fundkredit") ? "finance-fundkredit" : "finance";
-
   return (
-    <PublicCompanyProvider slug={slug}>
+    <PublicCompanyProvider slug="hariox">
       <FinanceIndexContent />
     </PublicCompanyProvider>
   );
