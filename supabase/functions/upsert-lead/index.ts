@@ -6,31 +6,14 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Infer company slug from request hostname - ONLY for known hariox.com subdomains
-// Custom franchise domains (like finance.fundkredit.com) must use custom_domain DB lookup first
+// Infer company slug from request hostname - always return hariox for single brand
 const inferCompanySlugFromHostname = (hostname: string): string | null => {
-  const host = hostname.toLowerCase();
-  // Only match known hariox.com subdomains explicitly - never use startsWith("finance.") etc.
-  if (host === "capital.hariox.com" || host.includes("capital.hariox") || host.includes("capital-hariox")) return "hariox";
-  if (host === "finance.hariox.com" || host.includes("finance.hariox") || host.includes("finance-hariox")) return "hariox";
-  if (host === "credit.hariox.com" || host.includes("credit.hariox") || host.includes("credit-hariox")) return "hariox";
-  if (host.includes("finance.fundkredit") || host.includes("fundkredit")) return "hariox";
-  if (host.includes("hariox")) return "hariox";
-  return null;
+  return "hariox";
 };
 
-// Fallback for preview domains where hostname won't contain the brand.
-// Uses the submitted source string to infer which company should own the lead.
+// Fallback for preview domains - always return hariox
 const inferCompanySlugFromSource = (source: unknown): string | null => {
-  const s = String(source || "").toLowerCase();
-  if (s.includes("hariox")) return "hariox";
-  if (s.includes("fundkredit")) return "hariox";
-  if (s.includes("hariox")) return "hariox";
-  if (s.includes("hariox")) return "hariox";
-  // Default for website + otp flows when no other hint is present
-  if (s.includes("otp") || s.includes("website")) return "hariox";
-  if (s.includes("hariox")) return "hariox";
-  return null;
+  return "hariox";
 };
 
 const getHostnameFromRequest = (req: Request): string | null => {

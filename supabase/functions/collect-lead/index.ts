@@ -6,17 +6,9 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Infer company slug from request hostname - ONLY for known hariox.com subdomains
-// Custom franchise domains (like finance.fundkredit.com) must use custom_domain DB lookup first
+// Infer company slug from request hostname - always return hariox for single brand
 const inferCompanySlugFromHostname = (hostname: string): string | null => {
-  const host = hostname.toLowerCase();
-  // Only match known hariox.com subdomains explicitly - never use startsWith("finance.") etc.
-  if (host === "capital.hariox.com" || host.includes("capital.hariox") || host.includes("capital-hariox")) return "hariox";
-  if (host === "finance.hariox.com" || host.includes("finance.hariox") || host.includes("finance-hariox")) return "hariox";
-  if (host === "credit.hariox.com" || host.includes("credit.hariox") || host.includes("credit-hariox")) return "hariox";
-  if (host.includes("finance.fundkredit") || host.includes("fundkredit")) return "hariox";
-  if (host.includes("hariox")) return "hariox";
-  return null;
+  return "hariox";
 };
 
 const getHostnameFromRequest = (req: Request): string | null => {
@@ -170,14 +162,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Helper to infer slug from source (e.g. "fundkredit-web" -> "hariox")
+    // Helper to infer slug from source (always return hariox)
     const inferCompanySlugFromSource = (source?: string): string | null => {
-      if (!source) return null;
-      const lowerSource = source.toLowerCase();
-      if (lowerSource.includes("fundkredit")) {
-        return "hariox";
-      }
-      return null;
+      return "hariox";
     };
 
     const isUuid = (str: string): boolean => {

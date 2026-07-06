@@ -13,13 +13,6 @@ const getCorsHeaders = (req: Request) => {
 };
 
 const inferCompanySlugFromHostname = (hostname: string): string => {
-  const host = hostname.toLowerCase();
-  // Only match known hariox.com subdomains explicitly
-  if (host === "capital.hariox.com" || host.includes("capital.hariox") || host.includes("capital-hariox")) return "hariox";
-  if (host === "finance.hariox.com" || host.includes("finance.hariox") || host.includes("finance-hariox")) return "hariox";
-  if (host === "credit.hariox.com" || host.includes("credit.hariox") || host.includes("credit-hariox")) return "hariox";
-  if (host.includes("finance.fundkredit") || host.includes("fundkredit")) return "hariox";
-  if (host.includes("hariox")) return "hariox";
   return "hariox";
 };
 

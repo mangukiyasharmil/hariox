@@ -8,22 +8,12 @@ const corsHeaders = {
 
 // Payment domains per company slug - each brand gets its own payment page
 const PAYMENT_DOMAINS: Record<string, string> = {
-  hariox: "credit.hariox.com",
-  credit: "credit.hariox.com",
-  "credit-hariox": "credit.hariox.com",
-  finance: "finance.fundkredit.com",
-  "hariox": "finance.fundkredit.com",
-  "finance-hariox": "finance.hariox.com",
-  capital: "capital.hariox.com",
-  "capital-hariox": "capital.hariox.com",
+  hariox: "hariox.com",
 };
 
 // Also map by company_id directly for 100% accuracy
 const COMPANY_ID_DOMAINS: Record<string, string> = {
-  "0a817e57-9c31-4aba-b709-3647958b917e": "credit.hariox.com",
-  "e6b82169-19d7-4e93-a0c0-304b89bcab71": "finance.fundkredit.com",
-  "e00c26fa-d874-4977-9fc6-bdf6e6b66344": "finance.hariox.com",
-  "bbe9fc5c-0caf-458e-aada-fa33143c4ff4": "capital.hariox.com",
+  default: "hariox.com",
 };
 
 const LOAN_INFO = `
@@ -194,7 +184,7 @@ serve(async (req) => {
               COMPANY_ID_DOMAINS[companyId!] ||
               PAYMENT_DOMAINS[companySlug] ||
               PAYMENT_DOMAINS[companySlug.split("-")[0]] ||
-              "credit.hariox.com";
+              "hariox.com";
           }
         }
       }

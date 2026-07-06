@@ -72,11 +72,9 @@ serve(async (req) => {
         domain = company.website_url.replace(/^https?:\/\//, "");
       } else if (company?.slug) {
         const slugToDomain: Record<string, string> = {
-          hariox: "credit.hariox.com",
-          finance: "finance.hariox.com",
-          capital: "capital.hariox.com",
+          hariox: "hariox.com",
         };
-        domain = slugToDomain[company.slug] || "credit.hariox.com";
+        domain = slugToDomain[company.slug] || "hariox.com";
       }
     }
 

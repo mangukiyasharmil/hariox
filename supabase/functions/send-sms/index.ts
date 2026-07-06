@@ -195,11 +195,13 @@ const LEGACY_TYPE_MAP: Record<string, string> = {
 // DLT URL setting keys mapping
 const DLT_URL_KEYS = {
   telecaller: {
+    hariox: "sms_url_hariox_telecaller",
     credit: "sms_url_credit_telecaller",
     finance: "sms_url_finance_telecaller",
     capital: "sms_url_capital_telecaller",
   },
   marketing: {
+    hariox: "sms_url_hariox_marketing",
     credit: "sms_url_credit_marketing",
     finance: "sms_url_finance_marketing",
     capital: "sms_url_capital_marketing",
@@ -208,6 +210,8 @@ const DLT_URL_KEYS = {
 
 // Default fallback URLs
 const DEFAULT_URLS = {
+  hariox_telecaller: "https://hariox.com/pay/telecaller",
+  hariox_marketing: "https://hariox.com/pay/marketing",
   credit_telecaller: "https://credit.hariox.com/pay/telecaller",
   credit_marketing: "https://credit.hariox.com/pay/marketing",
   finance_telecaller: "https://finance.hariox.com/pay/telecaller",

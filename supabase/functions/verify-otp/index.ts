@@ -7,16 +7,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Infer company slug from request hostname - ONLY for known hariox subdomains
-// Custom franchise domains (like finance.fundkredit.com) must use custom_domain DB lookup
+// Infer company slug from request hostname - always return hariox for single brand
 const inferCompanySlugFromHostname = (hostname: string): string | null => {
-  const host = hostname.toLowerCase();
-  if (host === "capital.hariox.com" || host.includes("capital.hariox") || host.includes("capital-hariox")) return "hariox";
-  if (host === "finance.hariox.com" || host.includes("finance.hariox") || host.includes("finance-hariox")) return "hariox";
-  if (host === "credit.hariox.com" || host.includes("credit.hariox") || host.includes("credit-hariox")) return "hariox";
-  if (host.includes("finance.fundkredit") || host.includes("fundkredit")) return "hariox";
-  if (host.includes("hariox")) return "hariox";
-  return null;
+  return "hariox";
 };
 
 const getHostnameFromRequest = (req: Request): string | null => {

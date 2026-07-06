@@ -19,18 +19,9 @@ const OTP_TEMPLATE_MESSAGE = "Hello, OTP for your mobile number registration is 
 const GREENSMS_USERNAME = "HarioxSMS";
 const GREENSMS_SENDER = "FUNCER";
 
-// Infer company slug from request hostname - ONLY for known hariox subdomains
-// Custom franchise domains (like finance.fundkredit.com) must use custom_domain DB lookup
+// Infer company slug from request hostname - always return hariox for single brand
 const inferCompanySlugFromHostname = (hostname: string): string | null => {
-  const host = hostname.toLowerCase();
-  // Only match known hariox.com subdomains explicitly - never use startsWith("finance.") etc.
-  // because custom franchise domains like finance.fundkredit.com would match incorrectly
-  if (host === "capital.hariox.com" || host.includes("capital.hariox") || host.includes("capital-hariox")) return "hariox";
-  if (host === "finance.hariox.com" || host.includes("finance.hariox") || host.includes("finance-hariox")) return "hariox";
-  if (host === "credit.hariox.com" || host.includes("credit.hariox") || host.includes("credit-hariox")) return "hariox";
-  if (host.includes("finance.fundkredit") || host.includes("fundkredit")) return "hariox";
-  if (host.includes("hariox")) return "hariox";
-  return null;
+  return "hariox";
 };
 
 const getHostnameFromRequest = (req: Request): string | null => {
