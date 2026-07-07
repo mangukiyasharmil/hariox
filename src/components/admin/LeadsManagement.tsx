@@ -559,6 +559,7 @@ const LeadsManagement = () => {
                 </th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Customer</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Product Details</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Country</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Status</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Source</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Assigned To</th>
@@ -568,9 +569,9 @@ const LeadsManagement = () => {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={8} className="p-8 text-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto" /></td></tr>
+                <tr><td colSpan={9} className="p-8 text-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto" /></td></tr>
               ) : filteredLeads.length === 0 ? (
-                <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">No leads found</td></tr>
+                <tr><td colSpan={9} className="p-8 text-center text-muted-foreground">No orders found</td></tr>
               ) : (
                 paginatedLeads.map((lead) => (
                   <tr key={lead.id} className="border-t border-border hover:bg-muted/30">
@@ -599,6 +600,13 @@ const LeadsManagement = () => {
                       )}
                     </td>
                     <td className="p-4">
+                      {/* Country derived from state field */}
+                      <span className="text-sm">
+                        {lead.state === 'India' ? '🇮🇳' : lead.state === 'USA' ? '🇺🇸' : lead.state === 'UK' ? '🇬🇧' : lead.state === 'Canada' ? '🇨🇦' : lead.state === 'Australia' ? '🇦🇺' : lead.state === 'UAE' ? '🇦🇪' : lead.state === 'Singapore' ? '🇸🇬' : '🌐'}{' '}
+                        {lead.state || 'India'}
+                      </span>
+                    </td>
+                    <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(lead.status)}`}>
                         {getStatusLabel(lead.status)}
                       </span>
@@ -612,9 +620,9 @@ const LeadsManagement = () => {
                       >
                         <option value="">Unassigned</option>
                         {staffList.map((s) => {
-                          const roleLabel = s.role === 'telecaller' ? 'Telecaller' 
-                            : s.role === 'verification' ? 'Verification' 
-                            : s.role === 'login_team' ? 'Login Team' 
+                          const roleLabel = s.role === 'telecaller' ? 'Sales Agent' 
+                            : s.role === 'verification' ? 'Order Review' 
+                            : s.role === 'login_team' ? 'Fulfillment' 
                             : s.role;
                           return (
                             <option key={s.id} value={s.id}>

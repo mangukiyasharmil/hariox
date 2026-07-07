@@ -1,4 +1,4 @@
-import { Phone, MessageSquare, Star, IndianRupee, XCircle, Clock, Calendar, User, Eye, Bot } from "lucide-react";
+import { Phone, MessageSquare, Star, IndianRupee, XCircle, Clock, Calendar, User, Eye, Bot, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import WhatsAppIcon from "@/components/ui/whatsapp-icon";
@@ -261,13 +261,13 @@ const LeadCard = ({
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="h-8 w-8 text-primary hover:bg-primary/10"
+                        className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
                         onClick={(e) => { e.stopPropagation(); onMarkPaid(); }}
                       >
-                        <IndianRupee className="w-4 h-4" />
+                        <CheckCircle className="w-4 h-4" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>Mark Paid</p></TooltipContent>
+                    <TooltipContent side="bottom"><p>Confirm Order</p></TooltipContent>
                   </Tooltip>
                 )}
 

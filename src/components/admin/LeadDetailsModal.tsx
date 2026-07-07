@@ -405,7 +405,7 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
           {/* Header */}
           <div className="sticky top-0 bg-card z-10 flex items-center justify-between p-4 md:p-6 border-b border-border">
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-lg md:text-xl font-bold">Lead Details</h2>
+              <h2 className="text-lg md:text-xl font-bold">Customer Details</h2>
               <span className={`px-2 py-0.5 rounded text-xs text-white ${getStatusColor(formData.status || "unpaid")}`}>
                 {(formData.status || "unpaid").replace(/_/g, " ")}
               </span>
@@ -442,7 +442,7 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
               {/* Personal + Loan grids */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm text-muted-foreground">Personal Information</h3>
+                  <h3 className="font-semibold text-sm text-muted-foreground">Customer Information</h3>
                   <div className="space-y-3">
                     <div>
                       <Label>Name</Label>
@@ -474,7 +474,7 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm text-muted-foreground">Product &amp; Shopify Details</h3>
+                  <h3 className="font-semibold text-sm text-muted-foreground">Product &amp; Order Details</h3>
                   <div className="space-y-3">
                     <div>
                       <Label>Product Category</Label>

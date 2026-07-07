@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Target, IndianRupee, TrendingUp, TrendingDown,
   Globe, Headphones, Mail, MessageCircle, CreditCard, ChevronDown, ChevronUp,
+  ShoppingCart, Truck, RotateCcw,
 } from "lucide-react";
 import { CardSkeleton } from "@/components/ui/skeleton";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -103,6 +104,43 @@ const AdminDashboardView = ({
           </div>
         </div>
       </ErrorBoundary>
+
+      {/* Row 1b: E-commerce KPIs */}
+      <div className="grid grid-cols-3 gap-2">
+        {/* Avg Order Value */}
+        <div className="rounded-lg p-2 sm:p-3 border border-sky-200 dark:border-sky-800 bg-gradient-to-br from-sky-50 to-sky-100/50 dark:from-sky-950/40 dark:to-sky-900/20">
+          <div className="flex items-center gap-1 mb-0.5">
+            <ShoppingCart className="w-3 h-3 text-sky-600" />
+            <span className="text-[9px] sm:text-[10px] font-medium text-sky-700 dark:text-sky-300">Avg Order Value</span>
+          </div>
+          <p className="text-sm sm:text-lg font-bold text-sky-700 dark:text-sky-400">
+            ${stats.paidLeads > 0 ? Math.round(stats.totalRevenue / stats.paidLeads).toLocaleString("en-US") : "0"}
+          </p>
+          <p className="text-[8px] text-sky-500">{stats.paidLeads} orders</p>
+        </div>
+        {/* Fulfillment Rate */}
+        <div className="rounded-lg p-2 sm:p-3 border border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/40 dark:to-emerald-900/20">
+          <div className="flex items-center gap-1 mb-0.5">
+            <Truck className="w-3 h-3 text-emerald-600" />
+            <span className="text-[9px] sm:text-[10px] font-medium text-emerald-700 dark:text-emerald-300">Fulfillment Rate</span>
+          </div>
+          <p className="text-sm sm:text-lg font-bold text-emerald-700 dark:text-emerald-400">
+            {stats.paidLeads > 0 ? Math.round((stats.disbursedLeads / stats.paidLeads) * 100) : 0}%
+          </p>
+          <p className="text-[8px] text-emerald-500">{stats.disbursedLeads} delivered</p>
+        </div>
+        {/* Return Rate */}
+        <div className="rounded-lg p-2 sm:p-3 border border-rose-200 dark:border-rose-800 bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-950/40 dark:to-rose-900/20">
+          <div className="flex items-center gap-1 mb-0.5">
+            <RotateCcw className="w-3 h-3 text-rose-600" />
+            <span className="text-[9px] sm:text-[10px] font-medium text-rose-700 dark:text-rose-300">Return Rate</span>
+          </div>
+          <p className="text-sm sm:text-lg font-bold text-rose-700 dark:text-rose-400">
+            {stats.disbursedLeads > 0 ? Math.round((stats.lostLeads / stats.disbursedLeads) * 100) : 0}%
+          </p>
+          <p className="text-[8px] text-rose-500">{stats.lostLeads} returned</p>
+        </div>
+      </div>
 
       {/* Row 2: Finance Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -213,7 +251,7 @@ const AdminDashboardView = ({
                 { value: `${visitorStats.conversionRate}%`, label: "Conv", color: "text-green-600" },
                 { value: `${visitorStats.mobilePercent}%`, label: "Mobile", color: "text-orange-600" },
                 { value: `${visitorStats.bounceRate}%`, label: "Bounce", color: "text-red-600" },
-                { value: visitorStats.leadsGenerated, label: "Leads", color: "text-teal-600" },
+                { value: visitorStats.leadsGenerated, label: "Orders", color: "text-teal-600" },
               ].map(s => (
                 <div key={s.label} className="text-center p-2.5 rounded-lg bg-muted/30">
                   <p className={`text-sm sm:text-base font-bold ${s.color}`}>{s.value}</p>

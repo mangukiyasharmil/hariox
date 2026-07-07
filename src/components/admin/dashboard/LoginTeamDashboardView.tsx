@@ -1,4 +1,4 @@
-import { Building2, CheckCircle, Send, IndianRupee, XCircle, Clock } from "lucide-react";
+import { Package, Truck, CheckCircle, Send, DollarSign, XCircle, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyFilter } from "@/hooks/useCompanyFilter";
@@ -92,10 +92,10 @@ const LoginTeamDashboardView = ({ currentUserId, dateFilter, dateEndFilter }: Lo
       {/* Main Stats */}
       <div className="grid grid-cols-4 gap-1.5">
         {[
-          { value: s.verified, label: "Pending", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", icon: <Clock className="w-3.5 h-3.5" /> },
-          { value: s.processing, label: "Processing", color: "text-yellow-600", bg: "bg-yellow-50 dark:bg-yellow-950/30", icon: <Send className="w-3.5 h-3.5" /> },
-          { value: s.approved, label: "Approved", color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30", icon: <CheckCircle className="w-3.5 h-3.5" /> },
-          { value: s.disbursed, label: "Disbursed", color: "text-teal-600", bg: "bg-teal-50 dark:bg-teal-950/30", icon: <IndianRupee className="w-3.5 h-3.5" /> },
+          { value: s.verified, label: "Ready to Pack", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", icon: <Clock className="w-3.5 h-3.5" /> },
+          { value: s.processing, label: "Packed", color: "text-yellow-600", bg: "bg-yellow-50 dark:bg-yellow-950/30", icon: <Package className="w-3.5 h-3.5" /> },
+          { value: s.approved, label: "Shipped", color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30", icon: <Truck className="w-3.5 h-3.5" /> },
+          { value: s.disbursed, label: "Delivered", color: "text-teal-600", bg: "bg-teal-50 dark:bg-teal-950/30", icon: <CheckCircle className="w-3.5 h-3.5" /> },
         ].map((item) => (
           <div key={item.label} className={`p-2 sm:p-3 rounded-xl ${item.bg} text-center`}>
             <div className={`flex justify-center mb-0.5 ${item.color}`}>{item.icon}</div>
@@ -111,15 +111,15 @@ const LoginTeamDashboardView = ({ currentUserId, dateFilter, dateEndFilter }: Lo
         <div className="grid grid-cols-3 gap-2 text-center">
           <div>
             <p className="text-lg font-bold text-yellow-600">{s.todayProcessing}</p>
-            <p className="text-[9px] text-muted-foreground">Submitted</p>
+            <p className="text-[9px] text-muted-foreground">Dispatched</p>
           </div>
           <div>
             <p className="text-lg font-bold text-green-600">{s.todayApproved}</p>
-            <p className="text-[9px] text-muted-foreground">Approved</p>
+            <p className="text-[9px] text-muted-foreground">Shipped</p>
           </div>
           <div>
             <p className="text-lg font-bold text-teal-600">{s.todayDisbursed}</p>
-            <p className="text-[9px] text-muted-foreground">Disbursed</p>
+            <p className="text-[9px] text-muted-foreground">Delivered</p>
           </div>
         </div>
       </div>
@@ -127,18 +127,18 @@ const LoginTeamDashboardView = ({ currentUserId, dateFilter, dateEndFilter }: Lo
       {/* Bank-wise Stats */}
       {Object.keys(s.bankStats).length > 0 && (
         <div className="bg-card rounded-xl border border-border p-3">
-          <p className="text-xs font-semibold mb-2">Bank-wise Performance</p>
+          <p className="text-xs font-semibold mb-2">Courier-wise Performance</p>
           <div className="space-y-1.5">
             {Object.entries(s.bankStats).map(([bank, data]: [string, any]) => (
               <div key={bank} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5">
-                  <Building2 className="w-3 h-3 text-muted-foreground" />
+                  <Package className="w-3 h-3 text-muted-foreground" />
                   <span className="font-medium">{bank}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">{data.submitted} sent</span>
-                  <span className="text-green-600">{data.approved} ✓</span>
-                  <span className="text-red-600">{data.rejected} ✗</span>
+                  <span className="text-muted-foreground">{data.submitted} dispatched</span>
+                  <span className="text-green-600">{data.approved} delivered ✓</span>
+                  <span className="text-red-600">{data.rejected} returned ✗</span>
                 </div>
               </div>
             ))}
@@ -150,7 +150,7 @@ const LoginTeamDashboardView = ({ currentUserId, dateFilter, dateEndFilter }: Lo
       <div className="grid grid-cols-2 gap-1.5">
         <div className="bg-card rounded-xl border border-border p-2 sm:p-3 text-center">
           <p className="text-lg font-bold text-red-600">{s.rejected}</p>
-          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Rejected</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Returned</p>
         </div>
         <div className="bg-card rounded-xl border border-border p-2 sm:p-3 text-center">
           <p className="text-lg font-bold text-purple-600">{s.totalAssigned}</p>

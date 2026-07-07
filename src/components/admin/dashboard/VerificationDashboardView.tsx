@@ -91,8 +91,8 @@ const VerificationDashboardView = ({ currentUserId, dateFilter, dateEndFilter }:
       {/* Main Stats */}
       <div className="grid grid-cols-2 gap-1.5">
         {[
-          { value: s.todayAssigned, label: "Paid Today", color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-950/30", icon: <Calendar className="w-3.5 h-3.5" /> },
-          { value: s.queue, label: "Paid Queue", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", icon: <Clock className="w-3.5 h-3.5" /> },
+          { value: s.todayAssigned, label: "Orders Today", color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-950/30", icon: <Calendar className="w-3.5 h-3.5" /> },
+          { value: s.queue, label: "Review Queue", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", icon: <Clock className="w-3.5 h-3.5" /> },
         ].map((item) => (
           <div key={item.label} className={`p-3 rounded-xl ${item.bg} text-center`}>
             <div className={`flex justify-center mb-0.5 ${item.color}`}>{item.icon}</div>
@@ -105,8 +105,8 @@ const VerificationDashboardView = ({ currentUserId, dateFilter, dateEndFilter }:
       {/* Secondary Stats */}
       <div className="grid grid-cols-3 gap-1.5">
         {[
-          { value: s.verified, label: "Verified", color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30", icon: <CheckCircle className="w-3.5 h-3.5" /> },
-          { value: s.rejected, label: "Rejected", color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", icon: <XCircle className="w-3.5 h-3.5" /> },
+          { value: s.verified, label: "Approved", color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30", icon: <CheckCircle className="w-3.5 h-3.5" /> },
+          { value: s.rejected, label: "Cancelled", color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", icon: <XCircle className="w-3.5 h-3.5" /> },
           { value: s.totalAssigned, label: "Total", color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-950/30", icon: <FileCheck className="w-3.5 h-3.5" /> },
         ].map((item) => (
           <div key={item.label} className={`p-2 sm:p-3 rounded-xl ${item.bg} text-center`}>
@@ -121,29 +121,29 @@ const VerificationDashboardView = ({ currentUserId, dateFilter, dateEndFilter }:
       <div className="grid grid-cols-3 gap-1.5">
         <div className="bg-card rounded-xl border border-border p-2 sm:p-3 text-center">
           <p className="text-lg font-bold text-blue-600">{s.paid}</p>
-          <p className="text-[9px] sm:text-[10px] text-muted-foreground">New Paid</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground">New Orders</p>
         </div>
         <div className="bg-card rounded-xl border border-border p-2 sm:p-3 text-center">
           <p className="text-lg font-bold text-yellow-600">{s.docsPending}</p>
-          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Docs Pending</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Pmt Pending</p>
         </div>
         <div className="bg-card rounded-xl border border-border p-2 sm:p-3 text-center">
           <p className="text-lg font-bold text-cyan-600">{s.docsUploaded}</p>
-          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Docs Uploaded</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Pmt Confirmed</p>
         </div>
       </div>
 
       {/* Today's Performance */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 rounded-xl border border-green-200 dark:border-green-800 p-3">
-        <p className="text-xs font-semibold text-green-800 dark:text-green-200 mb-2">Today's Work (by date filter)</p>
+        <p className="text-xs font-semibold text-green-800 dark:text-green-200 mb-2">Today's Activity (by date filter)</p>
         <div className="grid grid-cols-2 gap-2 text-center">
           <div>
             <p className="text-lg font-bold text-green-600">{s.todayVerified}</p>
-            <p className="text-[9px] text-muted-foreground">Verified</p>
+            <p className="text-[9px] text-muted-foreground">Approved</p>
           </div>
           <div>
             <p className="text-lg font-bold text-red-600">{s.todayRejected}</p>
-            <p className="text-[9px] text-muted-foreground">Rejected</p>
+            <p className="text-[9px] text-muted-foreground">Cancelled</p>
           </div>
         </div>
       </div>

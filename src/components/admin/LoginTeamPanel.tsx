@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Building2, Send, CheckCircle, Clock, IndianRupee, FileText, XCircle, RefreshCw, Phone, User, Download, Eye, FileCheck, X, Search } from "lucide-react";
+import { Package, Truck, Send, CheckCircle, Clock, DollarSign, FileText, XCircle, RefreshCw, Phone, User, Download, Eye, FileCheck, X, Search } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,11 +29,15 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-const banks = [
-  "Werize",
-  "Faircent",
-  "IDFC First",
-  "Urban Money",
+// E-commerce courier partners
+const courierPartners = [
+  "Delhivery",
+  "BlueDart",
+  "FedEx",
+  "DTDC",
+  "India Post",
+  "Ekart",
+  "Shadowfax",
 ];
 
 const LoginTeamPanel = () => {
@@ -128,7 +132,7 @@ const LoginTeamPanel = () => {
   const handleCall = (phone: string) => window.open(`tel:+91${phone}`, "_self");
   
   const handleWhatsApp = (phone: string, name: string) => {
-    const message = `Hello ${name}, this is regarding your loan application status.`;
+    const message = `Hello ${name}, your Hariox order is being processed. We will update you with the tracking details shortly. 📦`;
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -379,8 +383,8 @@ const LoginTeamPanel = () => {
                   </span>
                 </div>
                 <div className="text-sm text-muted-foreground space-y-0.5">
-                  <p className="capitalize">{lead.loan_type} Loan</p>
-                  <p className="font-medium text-foreground">₹{Number(lead.loan_amount).toLocaleString("en-IN")}</p>
+                  <p className="capitalize">Product: {lead.loan_type === 'personal' ? 'Light Blue' : lead.loan_type === 'business' ? 'Pro Bundle' : lead.loan_type}</p>
+                  <p className="font-medium text-foreground">${Number(lead.loan_amount).toLocaleString("en-US")} order value</p>
                   <p>+91 {lead.phone}</p>
                   {lead.assigned_to && (
                     <p className="text-xs text-green-600">
@@ -426,7 +430,7 @@ const LoginTeamPanel = () => {
             ))}
             {filteredLeads.length === 0 && (
               <p className="text-center text-muted-foreground py-8">
-                {searchQuery || statusFilter !== "all" || dateFilter !== "all" ? "No matching leads found" : "No leads ready for bank processing"}
+                {searchQuery || statusFilter !== "all" || dateFilter !== "all" ? "No matching leads found" : "No orders ready for fulfillment"}
               </p>
             )}
           </div>
@@ -444,11 +448,8 @@ const LoginTeamPanel = () => {
                   <p className="text-muted-foreground">{selectedLead.email} • +91 {selectedLead.phone}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium capitalize">{selectedLead.loan_type} Loan</p>
-                  <p className="text-2xl font-bold text-primary">₹{Number(selectedLead.loan_amount).toLocaleString("en-IN")}</p>
-                  {selectedLead.emi_amount && (
-                    <p className="text-sm text-muted-foreground">EMI: ₹{Number(selectedLead.emi_amount).toLocaleString("en-IN")}/month</p>
-                  )}
+                  <p className="font-medium capitalize">Product: {selectedLead.loan_type === 'personal' ? 'Light Blue' : selectedLead.loan_type === 'business' ? 'Pro Bundle' : selectedLead.loan_type}</p>
+                  <p className="text-2xl font-bold text-primary">${Number(selectedLead.loan_amount).toLocaleString("en-US")} <span className="text-sm font-normal text-muted-foreground">order value</span></p>
                 </div>
               </div>
 
@@ -540,62 +541,62 @@ const LoginTeamPanel = () => {
               {/* Submit to Bank */}
               {selectedLead.status === "verified" && (
                 <div className="bg-muted/50 rounded-xl p-4 mb-6">
-                  <h3 className="font-semibold mb-3">Submit to Bank</h3>
+                  <h3 className="font-semibold mb-3">Dispatch Order</h3>
                   <div className="flex gap-3">
                     <select
                       className="flex-1 px-4 py-2 rounded-lg border border-input bg-background"
                       value={selectedBank}
                       onChange={(e) => setSelectedBank(e.target.value)}
                     >
-                      <option value="">Select Bank/NBFC</option>
-                      {banks.map((bank) => (
-                        <option key={bank} value={bank}>{bank}</option>
+                      <option value="">Select Courier Partner</option>
+                      {courierPartners.map((courier) => (
+                        <option key={courier} value={courier}>{courier}</option>
                       ))}
                     </select>
                     <Button onClick={handleSubmitToBank} disabled={!selectedBank}>
-                      <Send className="w-4 h-4 mr-2" />
-                      Submit
+                      <Package className="w-4 h-4 mr-2" />
+                      Dispatch
                     </Button>
                   </div>
                 </div>
               )}
 
               {/* Submissions History */}
-              <h3 className="font-semibold mb-4">Bank Submissions</h3>
+              <h3 className="font-semibold mb-4">Courier Dispatches</h3>
               <div className="space-y-3">
                 {bankSubmissions.map((sub) => (
                   <div key={sub.id} className="p-4 rounded-xl border border-border">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-2">
-                        <Building2 className="w-5 h-5 text-primary" />
+                        <Truck className="w-5 h-5 text-primary" />
                         <span className="font-medium">{sub.bank_name}</span>
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(sub.status)}`}>
-                        {sub.status}
+                        {sub.status === 'submitted' ? 'Dispatched' : sub.status === 'approved' ? 'Shipped' : sub.status === 'disbursed' ? 'Delivered' : sub.status}
                       </span>
                     </div>
                     <div className="text-sm text-muted-foreground mb-3">
                       <p>Submitted: {new Date(sub.submission_date).toLocaleDateString("en-IN")}</p>
                       {(sub as unknown as Record<string, unknown>).bank_application_id && (
-                        <p className="text-blue-600">Bank App ID: {(sub as unknown as Record<string, unknown>).bank_application_id as string}</p>
+                        <p className="text-blue-600">Tracking Number: {(sub as unknown as Record<string, unknown>).bank_application_id as string}</p>
                       )}
                       {sub.approval_amount && (
-                        <p className="text-green-600 font-medium">Approved: ₹{Number(sub.approval_amount).toLocaleString("en-IN")}</p>
+                        <p className="text-green-600 font-medium">Package Weight (kg): {Number(sub.approval_amount).toLocaleString("en-US")}</p>
                       )}
                       {sub.disbursement_date && (
-                        <p className="text-teal-600">Disbursed: {new Date(sub.disbursement_date).toLocaleDateString("en-IN")}</p>
+                        <p className="text-teal-600">Delivered: {new Date(sub.disbursement_date).toLocaleDateString("en-IN")}</p>
                       )}
                     </div>
 
                     {sub.status === "submitted" && (
                       <div className="space-y-2">
                         <Input
-                          placeholder="Bank Application ID"
+                          placeholder="Tracking Number"
                           value={bankApplicationId}
                           onChange={(e) => setBankApplicationId(e.target.value)}
                         />
                         <Input
-                          placeholder="Approval Amount"
+                          placeholder="Package Weight (kg)"
                           type="number"
                           value={approvalAmount}
                           onChange={(e) => setApprovalAmount(e.target.value)}
@@ -649,7 +650,7 @@ const LoginTeamPanel = () => {
                           }}
                         >
                           <RefreshCw className="w-4 h-4 mr-1" />
-                          Try Another Bank
+                           Return to Review
                         </Button>
                         <Button
                           size="sm"
@@ -666,7 +667,7 @@ const LoginTeamPanel = () => {
                     {sub.status === "approved" && (
                       <div className="space-y-2">
                         <Input
-                          placeholder="Approval Amount"
+                          placeholder="Package Weight (kg)"
                           type="number"
                           value={approvalAmount}
                           onChange={(e) => setApprovalAmount(e.target.value)}
@@ -677,8 +678,8 @@ const LoginTeamPanel = () => {
                           className="w-full"
                           onClick={() => handleUpdateSubmission(sub.id, "disbursed")}
                         >
-                          <IndianRupee className="w-4 h-4 mr-2" />
-                          Mark Disbursed
+                          <Package className="w-4 h-4 mr-2" />
+                          Mark Delivered
                         </Button>
                       </div>
                     )}
@@ -714,37 +715,37 @@ const LoginTeamPanel = () => {
               <>
                 <div className="bg-muted/50 rounded-xl p-3">
                   <p className="text-sm text-muted-foreground">{selectedLead.email} • +91 {selectedLead.phone}</p>
-                  <p className="font-medium capitalize mt-1">{selectedLead.loan_type} Loan — ₹{Number(selectedLead.loan_amount).toLocaleString("en-IN")}</p>
+                  <p className="font-medium capitalize mt-1">Product: {selectedLead.loan_type === 'personal' ? 'Light Blue' : selectedLead.loan_type === 'business' ? 'Pro Bundle' : selectedLead.loan_type} — ${Number(selectedLead.loan_amount).toLocaleString("en-US")} order value</p>
                 </div>
 
                 {/* Submit to Bank */}
                 {selectedLead.status === "verified" && (
                   <div className="bg-muted/50 rounded-xl p-3">
-                    <h3 className="font-semibold text-sm mb-2">Submit to Bank</h3>
+                    <h3 className="font-semibold text-sm mb-2">Dispatch Order</h3>
                     <select className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm mb-2" value={selectedBank} onChange={(e) => setSelectedBank(e.target.value)}>
-                      <option value="">Select Bank</option>
-                      {banks.map((bank) => (<option key={bank} value={bank}>{bank}</option>))}
+                      <option value="">Select Courier Partner</option>
+                      {courierPartners.map((courier) => (<option key={courier} value={courier}>{courier}</option>))}
                     </select>
                     <Button onClick={handleSubmitToBank} disabled={!selectedBank} size="sm" className="w-full">
-                      <Send className="w-3.5 h-3.5 mr-1" />Submit
+                      <Package className="w-3.5 h-3.5 mr-1" />Dispatch
                     </Button>
                   </div>
                 )}
 
                 {/* Bank Submissions */}
                 <div>
-                  <h3 className="font-semibold text-sm mb-2">Bank Submissions</h3>
+                  <h3 className="font-semibold text-sm mb-2">Courier Dispatches</h3>
                   <div className="space-y-2">
                     {bankSubmissions.map((sub) => (
                       <div key={sub.id} className="p-3 rounded-xl border border-border">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-sm">{sub.bank_name}</span>
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(sub.status)}`}>{sub.status}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(sub.status)}`}>{sub.status === 'submitted' ? 'Dispatched' : sub.status === 'approved' ? 'Shipped' : sub.status === 'disbursed' ? 'Delivered' : sub.status}</span>
                         </div>
                         {sub.status === "submitted" && (
                           <div className="space-y-2">
-                            <Input placeholder="Bank App ID" value={bankApplicationId} onChange={(e) => setBankApplicationId(e.target.value)} className="h-8 text-sm" />
-                            <Input placeholder="Approval Amount" type="number" value={approvalAmount} onChange={(e) => setApprovalAmount(e.target.value)} className="h-8 text-sm" />
+                            <Input placeholder="Tracking Number" value={bankApplicationId} onChange={(e) => setBankApplicationId(e.target.value)} className="h-8 text-sm" />
+                            <Input placeholder="Package Weight (kg)" type="number" value={approvalAmount} onChange={(e) => setApprovalAmount(e.target.value)} className="h-8 text-sm" />
                             <div className="flex gap-2">
                               <Button size="sm" variant="outline" className="flex-1 text-red-600" onClick={() => handleUpdateSubmission(sub.id, "rejected")}>Rejected</Button>
                               <Button size="sm" variant="outline" className="flex-1 text-green-600" onClick={() => handleUpdateSubmission(sub.id, "approved")}>Approved</Button>
@@ -753,7 +754,7 @@ const LoginTeamPanel = () => {
                         )}
                         {sub.status === "approved" && (
                           <Button size="sm" className="w-full mt-2" onClick={() => handleUpdateSubmission(sub.id, "disbursed")}>
-                            <IndianRupee className="w-3.5 h-3.5 mr-1" />Mark Disbursed
+                            <Package className="w-3.5 h-3.5 mr-1" />Mark Delivered
                           </Button>
                         )}
                         {sub.status === "rejected" && (
@@ -763,7 +764,7 @@ const LoginTeamPanel = () => {
                               setSelectedLead(prev => prev ? { ...prev, status: "verified" } : null);
                               fetchUserAndLeads();
                             }}>
-                              <RefreshCw className="w-3 h-3 mr-1" />Try Another
+                              <RefreshCw className="w-3 h-3 mr-1" />Return to Review
                             </Button>
                             <Button size="sm" variant="outline" className="flex-1 text-gray-600" onClick={() => setLostModal(true)}>
                               <XCircle className="w-3 h-3 mr-1" />Lost
@@ -785,14 +786,14 @@ const LoginTeamPanel = () => {
       <Dialog open={lostModal} onOpenChange={setLostModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Mark Lead as Lost</DialogTitle>
+            <DialogTitle>Mark Order as Returned</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <p className="text-sm text-muted-foreground">
               This will move the lead to "Lost" status. Please provide a reason.
             </p>
             <Textarea
-              placeholder="Reason for marking as lost..."
+              placeholder="Return reason..."
               value={lostReason}
               onChange={(e) => setLostReason(e.target.value)}
               rows={3}
@@ -800,7 +801,7 @@ const LoginTeamPanel = () => {
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setLostModal(false)} className="flex-1">Cancel</Button>
               <Button variant="destructive" onClick={handleMarkAsLost} disabled={!lostReason.trim()} className="flex-1">
-                <XCircle className="w-4 h-4 mr-2" />Mark as Lost
+                <XCircle className="w-4 h-4 mr-2" />Mark Returned
               </Button>
             </div>
           </div>

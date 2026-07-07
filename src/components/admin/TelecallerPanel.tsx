@@ -403,7 +403,7 @@ For any queries, feel free to reply to this message.`;
     if (!lead) {
       return (
         <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
-          Select a lead to view details
+          Select a customer to view details
         </div>
       );
     }
@@ -641,10 +641,10 @@ For any queries, feel free to reply to this message.`;
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-card rounded-2xl border border-border p-4">
             <h2 className="text-lg font-semibold mb-4">
-              {filter === "fresh" ? "Fresh Leads" : 
-               filter === "interested" ? "Interest - Follow Up" :
+              {filter === "fresh" ? "New Enquiries" : 
+               filter === "interested" ? "Interested Customers" :
                filter === "retry" ? "Retry Calls" :
-               filter === "active" ? "All Active Leads" : "Lost Leads"}
+               filter === "active" ? "All Enquiries & Orders" : "Cancelled/Returned Orders"}
               <span className="ml-2 text-sm font-normal text-muted-foreground">
                 ({filteredLeads.length})
               </span>
@@ -686,7 +686,7 @@ For any queries, feel free to reply to this message.`;
 
             {filteredLeads.length === 0 && (
               <p className="text-center text-muted-foreground py-8">
-                {searchTerm ? "No leads match your search" : "No leads in this category"}
+                {searchTerm ? "No customers match your search" : "No customers in this category"}
               </p>
             )}
 

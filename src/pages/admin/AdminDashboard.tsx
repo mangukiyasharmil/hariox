@@ -27,6 +27,9 @@ import {
   Receipt,
   FileText,
   Crown,
+  ShoppingCart,
+  Package,
+  DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,11 +87,11 @@ const navGroups: NavGroup[] = [
   {
     label: "CRM",
     items: [
-      { icon: Users, label: "Leads", path: "leads", roles: ["admin", "manager"] },
+      { icon: ShoppingCart, label: "Cart Leads", path: "leads", roles: ["admin", "manager"] },
       { icon: Phone, label: "Sales Agents", path: "telecaller", roles: ["admin", "manager", "telecaller"] },
-      { icon: IndianRupee, label: "Payments", path: "payments", roles: ["admin", "manager", "telecaller"] },
+      { icon: DollarSign, label: "Payments", path: "payments", roles: ["admin", "manager", "telecaller"] },
       { icon: FileCheck, label: "Order Review", path: "verification", roles: ["admin", "manager", "verification"] },
-      { icon: Building2, label: "Fulfillment", path: "login-team", roles: ["admin", "manager", "login_team"] },
+      { icon: Package, label: "Fulfillment", path: "login-team", roles: ["admin", "manager", "login_team"] },
     ],
   },
   {

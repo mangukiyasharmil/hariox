@@ -35,13 +35,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// E-commerce order verification checklist
 const requiredDocuments = [
-  { type: "aadhaar", label: "Aadhaar Card" },
-  { type: "pan", label: "PAN Card" },
-  { type: "salary_slip", label: "Salary Slip (3 months)" },
-  { type: "form16", label: "Form-16" },
-  { type: "itr", label: "ITR (2 years)" },
-  { type: "bank_statement", label: "Bank Statement (6 months)" },
+  { type: "customer_id", label: "Customer ID Verified" },
+  { type: "billing_address", label: "Billing Address Confirmed" },
+  { type: "payment_receipt", label: "Payment Receipt Confirmed" },
+  { type: "shipping_address", label: "Shipping Address Validated" },
+  { type: "product_availability", label: "Product Availability Checked" },
+  { type: "order_notes", label: "Order Notes Reviewed" },
   { type: "other", label: "Other Document" },
 ];
 
@@ -429,7 +430,7 @@ Thank you for choosing Credit Hariox!`;
       <div className="lg:col-span-1 space-y-4">
         <div className="bg-card rounded-2xl border border-border p-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Verification Queue</h2>
+            <h2 className="text-lg font-semibold">Order Review Queue</h2>
             <Button variant="outline" size="sm" onClick={handleExport} disabled={filteredLeads.length === 0}>
               <FileSpreadsheet className="w-4 h-4 mr-1" />
               Export
@@ -568,7 +569,7 @@ Thank you for choosing Credit Hariox!`;
             ))}
             {filteredLeads.length === 0 && (
               <p className="text-center text-muted-foreground py-8">
-                {searchQuery || statusFilter !== "all" || dateFilter !== "all" ? "No matching leads found" : "No leads in verification queue"}
+                {searchQuery || statusFilter !== "all" || dateFilter !== "all" ? "No matching leads found" : "No orders in review queue"}
               </p>
             )}
           </div>
@@ -586,8 +587,8 @@ Thank you for choosing Credit Hariox!`;
                   <p className="text-muted-foreground">{selectedLead.email} • +91 {selectedLead.phone}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium capitalize">{selectedLead.loan_type} Loan</p>
-                  <p className="text-muted-foreground">₹{Number(selectedLead.loan_amount).toLocaleString("en-IN")}</p>
+                  <p className="font-medium capitalize">Product: {selectedLead.loan_type === 'personal' ? 'Light Blue' : selectedLead.loan_type === 'business' ? 'Pro Bundle' : selectedLead.loan_type === 'home' ? 'Starter Pack' : selectedLead.loan_type}</p>
+                  <p className="font-bold text-primary">${Number(selectedLead.loan_amount).toLocaleString("en-US")} Order Value</p>
                 </div>
               </div>
 
@@ -595,7 +596,7 @@ Thank you for choosing Credit Hariox!`;
               <AdditionalLeadFields lead={selectedLead} onSaved={() => fetchUserAndLeads()} />
 
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold">Document Checklist</h3>
+                <h3 className="font-semibold">Order Verification Checklist</h3>
                 <Button
                   size="sm"
                   variant="outline"
@@ -739,9 +740,9 @@ Thank you for choosing Credit Hariox!`;
             </div>
 
             <div className="bg-card rounded-2xl border border-border p-6">
-              <h3 className="font-semibold mb-4">Verification Decision</h3>
+              <h3 className="font-semibold mb-4">Order Review Decision</h3>
               <Textarea
-                placeholder="Add remarks (required for rejection)..."
+                placeholder="Add review notes (required for cancellation)..."
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 className="mb-4"
@@ -754,7 +755,7 @@ Thank you for choosing Credit Hariox!`;
                   onClick={() => handleVerifyLead(false)}
                 >
                   <XCircle className="w-4 h-4 mr-2" />
-                  Reject Application
+                  Cancel Order
                 </Button>
                 <Button
                   variant="hero"
@@ -763,14 +764,14 @@ Thank you for choosing Credit Hariox!`;
                   disabled={documents.length === 0 || documents.some(d => d.status !== "verified")}
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  Approve & Send to Bank
+                  Approve Order
                 </Button>
               </div>
             </div>
           </>
         ) : (
           <div className="bg-card rounded-2xl border border-border p-12 text-center text-muted-foreground">
-            Select a lead from the queue to verify documents
+            Select an order from the review queue to verify
           </div>
         )}
       </div>
@@ -790,7 +791,7 @@ Thank you for choosing Credit Hariox!`;
               <>
                 <div className="bg-muted/50 rounded-xl p-3">
                   <p className="text-sm text-muted-foreground">{selectedLead.email} • +91 {selectedLead.phone}</p>
-                  <p className="font-medium capitalize mt-1">{selectedLead.loan_type} Loan — ₹{Number(selectedLead.loan_amount).toLocaleString("en-IN")}</p>
+                  <p className="font-medium capitalize mt-1">Product: {selectedLead.loan_type} — ${Number(selectedLead.loan_amount).toLocaleString("en-US")}</p>
                 </div>
 
                 {/* Editable Additional Fields - Mobile */}
@@ -799,7 +800,7 @@ Thank you for choosing Credit Hariox!`;
                 {/* Document Checklist */}
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-semibold text-sm">Documents</h3>
+                    <h3 className="font-semibold text-sm">Order Verification Checklist</h3>
                     <Button size="sm" variant="outline" onClick={() => setUploadModal(true)}>
                       <Plus className="w-3 h-3 mr-1" />
                       Add
@@ -846,16 +847,16 @@ Thank you for choosing Credit Hariox!`;
 
                 {/* Verification Decision */}
                 <div className="border-t border-border pt-4">
-                  <h3 className="font-semibold text-sm mb-2">Decision</h3>
+                  <h3 className="font-semibold text-sm mb-2">Order Review Decision</h3>
                   <Textarea placeholder="Remarks..." value={remarks} onChange={(e) => setRemarks(e.target.value)} rows={2} className="mb-3" />
                   <div className="flex gap-2">
                     <Button variant="outline" className="flex-1 text-red-600 border-red-200" onClick={() => handleVerifyLead(false)}>
                       <XCircle className="w-4 h-4 mr-1" />
-                      Reject
+                      Cancel Order
                     </Button>
                     <Button className="flex-1" onClick={() => handleVerifyLead(true)} disabled={documents.length === 0 || documents.some(d => d.status !== "verified")}>
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Approve
+                      Approve Order
                     </Button>
                   </div>
                 </div>
@@ -869,11 +870,11 @@ Thank you for choosing Credit Hariox!`;
       <Dialog open={uploadModal} onOpenChange={setUploadModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Upload Document Manually</DialogTitle>
+            <DialogTitle>Upload Order Document</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium">Document Type</label>
+              <label className="text-sm font-medium">Document / Check Type</label>
               <Select value={uploadDocType} onValueChange={setUploadDocType}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select document type" />

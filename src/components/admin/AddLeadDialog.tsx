@@ -25,6 +25,7 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
     email: "",
     phone: "",
     city: "",
+    country: "India",                           // Map to state column as country
     product_category: "personal" as LoanType, // Map to loan_type enum
     order_value: "129",                       // Map to loan_amount numeric
     shopify_order_id: "",                     // Map to application_id text
@@ -44,6 +45,7 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
           full_name: formData.full_name,
           email: formData.email,
           city: formData.city || "N/A",
+          state: formData.country || "India",  // country stored in state column
           loan_type: formData.product_category,
           loan_amount: Number(formData.order_value) || 129,
           application_id: formData.shopify_order_id || null, // Shopify Order ID
@@ -66,6 +68,7 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
         email: "",
         phone: "",
         city: "",
+        country: "India",
         product_category: "personal",
         order_value: "129",
         shopify_order_id: "",
@@ -129,6 +132,25 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 placeholder="City name"
               />
+            </div>
+            
+            <div>
+              <Label>Country</Label>
+              <Select value={formData.country} onValueChange={(v) => setFormData({ ...formData, country: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="India">🇮🇳 India</SelectItem>
+                  <SelectItem value="USA">🇺🇸 USA</SelectItem>
+                  <SelectItem value="UK">🇬🇧 UK</SelectItem>
+                  <SelectItem value="Canada">🇨🇦 Canada</SelectItem>
+                  <SelectItem value="Australia">🇦🇺 Australia</SelectItem>
+                  <SelectItem value="UAE">🇦🇪 UAE</SelectItem>
+                  <SelectItem value="Singapore">🇸🇬 Singapore</SelectItem>
+                  <SelectItem value="Germany">🇩🇪 Germany</SelectItem>
+                  <SelectItem value="France">🇫🇷 France</SelectItem>
+                  <SelectItem value="Other">🌐 Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div>
