@@ -43,18 +43,19 @@ interface AssignmentHistoryRecord {
   created_at: string;
 }
 
-const statusOptions: Lead["status"][] = [
-  "unpaid",
-  "paid",
-  "verification",
-  "documents_pending",
-  "documents_uploaded",
-  "verified",
-  "rejected",
-  "processing",
-  "approved",
-  "disbursed",
-  "lost",
+// E-commerce status options with display labels
+const statusOptions: { value: Lead["status"]; label: string }[] = [
+  { value: "unpaid", label: "New Enquiry" },
+  { value: "paid", label: "Order Confirmed" },
+  { value: "verification", label: "In Review" },
+  { value: "documents_pending", label: "Payment Pending" },
+  { value: "documents_uploaded", label: "Payment Received" },
+  { value: "verified", label: "Processing" },
+  { value: "processing", label: "Packed" },
+  { value: "approved", label: "Shipped" },
+  { value: "disbursed", label: "Delivered" },
+  { value: "rejected", label: "Cancelled" },
+  { value: "lost", label: "Returned" },
 ];
 
 const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModalProps) => {
@@ -207,7 +208,7 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
           id: p.id,
           type: "payment",
           title: `Payment ${p.status === "completed" ? "Received" : p.status}`,
-          description: `₹${p.total_amount?.toLocaleString("en-IN")} via ${p.payment_source}`,
+          description: `$${p.total_amount?.toLocaleString("en-US")} via ${p.payment_source}`,
           timestamp: p.created_at,
           metadata: p,
           actor_id: p.collected_by,
@@ -337,15 +338,16 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       unpaid: "bg-yellow-500",
-      paid: "bg-blue-500",
+      paid: "bg-green-500",
       verification: "bg-purple-500",
       documents_pending: "bg-orange-500",
       documents_uploaded: "bg-cyan-500",
-      verified: "bg-green-500",
+      verified: "bg-indigo-500",
       rejected: "bg-red-500",
-      processing: "bg-indigo-500",
-      approved: "bg-emerald-500",
-      disbursed: "bg-teal-500",
+      processing: "bg-blue-500",
+      approved: "bg-teal-500",
+      disbursed: "bg-emerald-500",
+      lost: "bg-gray-400",
     };
     return colors[status] || "bg-gray-500";
   };
@@ -528,7 +530,7 @@ const LeadDetailsModal = ({ lead, staffList, onClose, onSaved }: LeadDetailsModa
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as Lead["status"] })}
                     >
                       {statusOptions.map((s) => (
-                        <option key={s} value={s} className="capitalize">{s.replace(/_/g, " ")}</option>
+                        <option key={s.value} value={s.value} className="capitalize">{s.label}</option>
                       ))}
                     </select>
                   </div>

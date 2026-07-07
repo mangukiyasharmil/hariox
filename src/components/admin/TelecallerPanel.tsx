@@ -211,17 +211,17 @@ const TelecallerPanel = () => {
     const paymentLink = `${domainMap[slug] || "https://credit.hariox.com"}/telecaller`;
     const message = `Hello ${name},
 
-Thank you for showing interest in our loan services!
+Thank you for your interest in Hariox! 🛍️
 
-🏦 *${companyName}* is here to help you get your loan approved quickly.
+*${companyName}* is here to help you get your Shopify store set up quickly.
 
-📋 *Next Step:* Complete your ₹799 consultation fee payment to start the process.
+📦 *Next Step:* Complete your $129 store setup fee to get started.
 
 💳 *Pay Now:* ${paymentLink}
 
-✅ 30+ Partner Banks
-✅ Quick Approval
-✅ 24hr Disbursal
+✅ Fast Onboarding
+✅ Expert Support
+✅ Shopify Optimized
 
 For any queries, feel free to reply to this message.`;
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, "_blank");
@@ -432,19 +432,21 @@ For any queries, feel free to reply to this message.`;
                 <p className="font-medium">{lead.city}</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-2.5">
-                <p className="text-muted-foreground text-xs">Loan Type</p>
-                <p className="font-medium capitalize">{lead.loan_type}</p>
+                <p className="text-muted-foreground text-xs">Product</p>
+                <p className="font-medium capitalize">
+                  {lead.loan_type === 'personal' ? 'Hariox Light Blue' : lead.loan_type === 'business' ? 'Pro Bundle' : lead.loan_type === 'home' ? 'Starter Pack' : lead.loan_type === 'marriage' ? 'Custom Branding' : lead.loan_type}
+                </p>
               </div>
               <div className="bg-muted/50 rounded-lg p-2.5">
-                <p className="text-muted-foreground text-xs">Amount</p>
-                <p className="font-medium">₹{Number(lead.loan_amount).toLocaleString("en-IN")}</p>
+                <p className="text-muted-foreground text-xs">Order Value</p>
+                <p className="font-medium">${Number(lead.loan_amount || 129).toLocaleString("en-US")}</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-2.5">
-                <p className="text-muted-foreground text-xs">Income</p>
-                <p className="font-medium">₹{Number(lead.monthly_income).toLocaleString("en-IN")}</p>
+                <p className="text-muted-foreground text-xs">Customer Budget</p>
+                <p className="font-medium">${Number(lead.monthly_income || 0).toLocaleString("en-US")}</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-2.5">
-                <p className="text-muted-foreground text-xs">CIBIL Range</p>
+                <p className="text-muted-foreground text-xs">Customer Rating</p>
                 <p className="font-medium">{(lead as any).cibil_score_range || "N/A"}</p>
               </div>
             </div>
@@ -478,7 +480,7 @@ For any queries, feel free to reply to this message.`;
             {lead.status === "unpaid" && (
               <Button variant="outline" size="sm" className="text-gray-600" onClick={() => handleMarkAsLost(lead.id)}>
                 <XCircle className="w-4 h-4 mr-1" />
-                Lost
+                Mark Returned
               </Button>
             )}
           </div>
@@ -575,7 +577,7 @@ For any queries, feel free to reply to this message.`;
             { key: "interested" as const, label: "Interest", activeColor: "bg-yellow-600 text-white", icon: <Star className="w-3 h-3" /> as React.ReactNode },
             { key: "retry" as const, label: "Retry", activeColor: "bg-orange-600 text-white", icon: <Phone className="w-3 h-3" /> as React.ReactNode },
             { key: "active" as const, label: "Active", activeColor: "bg-primary text-primary-foreground", icon: null as React.ReactNode },
-            { key: "lost" as const, label: "Lost", activeColor: "bg-gray-600 text-white", icon: null as React.ReactNode },
+            { key: "lost" as const, label: "Returned", activeColor: "bg-gray-600 text-white", icon: null as React.ReactNode },
           ]).map(f => (
             <button
               key={f.key}

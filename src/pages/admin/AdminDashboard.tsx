@@ -85,10 +85,10 @@ const navGroups: NavGroup[] = [
     label: "CRM",
     items: [
       { icon: Users, label: "Leads", path: "leads", roles: ["admin", "manager"] },
-      { icon: Phone, label: "Telecaller", path: "telecaller", roles: ["admin", "manager", "telecaller"] },
+      { icon: Phone, label: "Sales Agents", path: "telecaller", roles: ["admin", "manager", "telecaller"] },
       { icon: IndianRupee, label: "Payments", path: "payments", roles: ["admin", "manager", "telecaller"] },
-      { icon: FileCheck, label: "Verification", path: "verification", roles: ["admin", "manager", "verification"] },
-      { icon: Building2, label: "Login Dept", path: "login-team", roles: ["admin", "manager", "login_team"] },
+      { icon: FileCheck, label: "Order Review", path: "verification", roles: ["admin", "manager", "verification"] },
+      { icon: Building2, label: "Fulfillment", path: "login-team", roles: ["admin", "manager", "login_team"] },
     ],
   },
   {
@@ -104,7 +104,7 @@ const navGroups: NavGroup[] = [
     label: "Reports",
     items: [
       { icon: BarChart3, label: "Reports", path: "reports", roles: ["admin", "manager"] },
-      { icon: Receipt, label: "Finance & GST", path: "finance", roles: ["admin", "manager"] },
+      { icon: Receipt, label: "Accounting", path: "finance", roles: ["admin", "manager"] },
       { icon: Workflow, label: "Workflows", path: "workflows", roles: ["admin", "manager"] },
     ],
   },
@@ -439,9 +439,9 @@ const AdminDashboardContent = () => {
             {currentCompany?.logo_url ? (
               <img src={currentCompany.logo_url} alt={currentCompany.name} className="w-10 h-10 rounded-lg object-cover" />
             ) : (
-              <img src={financeLogoIcon} alt="Credit Hariox" className="w-10 h-10 rounded-lg object-cover" />
+              <img src={financeLogoIcon} alt="Hariox CRM" className="w-10 h-10 rounded-lg object-cover" />
             )}
-            {isSidebarOpen && <span className="font-bold text-lg">{currentCompany?.name || "Credit Hariox"}</span>}
+            {isSidebarOpen && <span className="font-bold text-lg">{currentCompany?.name || "Hariox CRM"}</span>}
           </Link>
           <button
             onClick={() => setIsMobileSidebarOpen(false)}

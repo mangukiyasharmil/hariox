@@ -169,8 +169,8 @@ const AddLeadDialog = ({ isOpen, onClose, onSuccess }: AddLeadDialogProps) => {
               <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v as LeadStatus })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="unpaid">Pending Lead</SelectItem>
-                  <SelectItem value="paid">Active Customer</SelectItem>
+                  <SelectItem value="unpaid">New Enquiry</SelectItem>
+                  <SelectItem value="paid">Order Confirmed</SelectItem>
                 </SelectContent>
               </Select>
             </div>

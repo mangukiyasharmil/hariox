@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { IndianRupee, Plus, TrendingUp, TrendingDown, Calendar, FileText, Edit2, Trash2, Download, Receipt, FileSpreadsheet } from "lucide-react";
+import { IndianRupee, DollarSign, Plus, TrendingUp, TrendingDown, Calendar, FileText, Edit2, Trash2, Download, Receipt, FileSpreadsheet } from "lucide-react";
 import GSTReturnsSection from "./GSTReturnsSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,6 +91,8 @@ const AccountingModule = () => {
   const [invoices, setInvoices] = useState<GSTInvoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dateFilter, setDateFilter] = useState<"today" | "yesterday" | "week" | "month" | "all">("month");
+  // Currency display toggle: INR (₹) or USD ($)
+  const [currency, setCurrency] = useState<"INR" | "USD">("INR");
   // Transaction type and category filters
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -352,6 +354,15 @@ const AccountingModule = () => {
       fetchData();
     }
     setEntryToDelete(null);
+  };
+
+  // Format a monetary amount with the active currency symbol
+  // GST is always shown in INR (₹) regardless of this setting
+  const formatAmt = (n: number, decimals = 0) => {
+    if (currency === "USD") {
+      return `$${n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}` ;
+    }
+    return `₹${n.toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
   };
 
   // Calculate GST values
@@ -1242,6 +1253,30 @@ const AccountingModule = () => {
                 <option value="all">All Time</option>
               </select>
               
+              {/* Currency Toggle */}
+              <div className="flex items-center rounded-lg border border-input bg-background overflow-hidden">
+                <button
+                  onClick={() => setCurrency("INR")}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                    currency === "INR"
+                      ? "bg-orange-500 text-white"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <IndianRupee className="w-3 h-3" /> INR
+                </button>
+                <button
+                  onClick={() => setCurrency("USD")}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                    currency === "USD"
+                      ? "bg-blue-500 text-white"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <DollarSign className="w-3 h-3" /> USD
+                </button>
+              </div>
+
               {/* Type Filter */}
               <select className="px-2 py-1.5 rounded-lg border border-input bg-background text-xs sm:text-sm" value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value as any); setCategoryFilter("all"); }}>
                 <option value="all">All Types</option>
@@ -1324,7 +1359,7 @@ const AccountingModule = () => {
                     {/* Multi-amount input for Marketing Meta */}
                     {formData.category === "Marketing Meta" ? (
                       <div className="space-y-3">
-                        <label className="text-sm font-medium">Ad Account Amounts (₹)</label>
+                        <label className="text-sm font-medium">Ad Account Amounts ({currency === "INR" ? "₹" : "$"})</label>
                         {metaAmounts.map((amt, idx) => (
                           <div key={idx} className="flex gap-2 items-center">
                             <Input
@@ -1360,13 +1395,13 @@ const AccountingModule = () => {
                         </Button>
                         {metaAmounts.filter(a => Number(a) > 0).length > 0 && (
                           <div className="text-right font-semibold text-primary">
-                            Total: ₹{metaAmounts.reduce((sum, a) => sum + (Number(a) || 0), 0).toLocaleString("en-IN")}
+                            Total: {formatAmt(metaAmounts.reduce((sum, a) => sum + (Number(a) || 0), 0))}
                           </div>
                         )}
                       </div>
                     ) : (
                       <div>
-                        <label className="text-sm font-medium">Amount (₹)</label>
+                        <label className="text-sm font-medium">Amount ({currency === "INR" ? "₹" : "$"})</label>
                         <Input
                           type="number"
                           placeholder="Enter amount"
@@ -1433,14 +1468,14 @@ const AccountingModule = () => {
                 <TrendingUp className="w-4 h-4 text-green-600" />
                 <span className="text-[10px] sm:text-sm text-muted-foreground">Income</span>
               </div>
-              <p className="text-base sm:text-2xl font-bold text-green-600">₹{totalIncome.toLocaleString("en-IN")}</p>
+              <p className="text-base sm:text-2xl font-bold text-green-600">{formatAmt(totalIncome)}</p>
             </div>
             <div className="bg-card rounded-xl p-3 sm:p-5 border border-border">
               <div className="flex items-center gap-1.5 mb-1">
                 <TrendingDown className="w-4 h-4 text-red-600" />
                 <span className="text-[10px] sm:text-sm text-muted-foreground">Expenses</span>
               </div>
-              <p className="text-base sm:text-2xl font-bold text-red-600">₹{totalExpense.toLocaleString("en-IN")}</p>
+              <p className="text-base sm:text-2xl font-bold text-red-600">{formatAmt(totalExpense)}</p>
             </div>
             <div className={`rounded-xl p-3 sm:p-5 border ${netProfit >= 0 ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
               <div className="flex items-center gap-1.5 mb-1">
@@ -1448,7 +1483,7 @@ const AccountingModule = () => {
                 <span className="text-[10px] sm:text-sm text-muted-foreground">Gross Profit</span>
               </div>
               <p className={`text-base sm:text-2xl font-bold ${netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                {netProfit >= 0 ? "+" : "-"}₹{Math.abs(netProfit).toLocaleString("en-IN")}
+                {netProfit >= 0 ? "+" : "-"}{formatAmt(Math.abs(netProfit))}
               </p>
             </div>
             <div className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/40 dark:to-amber-900/20 rounded-xl p-3 sm:p-5 border border-amber-200 dark:border-amber-800">
@@ -1481,7 +1516,7 @@ const AccountingModule = () => {
                 <span className="text-[10px] sm:text-sm text-muted-foreground">Net Profit</span>
               </div>
               <p className={`text-base sm:text-2xl font-bold ${(netProfit - gstData.netGST) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                {(netProfit - gstData.netGST) < 0 ? "-" : ""}₹{Math.abs(netProfit - gstData.netGST).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {(netProfit - gstData.netGST) < 0 ? "-" : ""}{formatAmt(Math.abs(netProfit - gstData.netGST), 2)}
               </p>
             </div>
           </div>
@@ -1514,7 +1549,7 @@ const AccountingModule = () => {
                             {customerPhone && <p className="text-[10px] text-muted-foreground">{customerPhone}</p>}
                           </div>
                           <p className={`font-bold text-sm ${entry.entry_type === "income" ? "text-green-600" : "text-red-600"}`}>
-                            {entry.entry_type === "income" ? "+" : "-"}₹{Number(entry.amount).toLocaleString("en-IN")}
+                            {entry.entry_type === "income" ? "+" : "-"}{formatAmt(Number(entry.amount))}
                           </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -1593,7 +1628,7 @@ const AccountingModule = () => {
                               ) : "-"}
                             </td>
                             <td className={`p-4 text-right font-semibold whitespace-nowrap ${entry.entry_type === "income" ? "text-green-600" : "text-red-600"}`}>
-                              {entry.entry_type === "income" ? "+" : "-"}₹{Number(entry.amount).toLocaleString("en-IN")}
+                              {entry.entry_type === "income" ? "+" : "-"}{formatAmt(Number(entry.amount))}
                             </td>
                             <td className="p-4 text-center">
                               <div className="flex justify-center gap-1">
@@ -1636,7 +1671,7 @@ const AccountingModule = () => {
                             <p className="font-medium text-sm">{invoice.customer_name}</p>
                             <p className="text-[10px] text-muted-foreground">{invoice.customer_phone}</p>
                           </div>
-                          <p className="font-bold text-sm">₹{Number(invoice.total_amount).toFixed(0)}</p>
+                          <p className="font-bold text-sm">{formatAmt(Number(invoice.total_amount))}</p>
                         </div>
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                           <div className="flex items-center gap-2">

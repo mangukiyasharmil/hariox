@@ -68,17 +68,17 @@ const AdminDashboardView = ({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-1.5">
               <Target className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs sm:text-sm font-semibold">Lead Funnel</span>
+              <span className="text-xs sm:text-sm font-semibold">Customer Funnel</span>
             </div>
             <span className="text-[10px] text-muted-foreground">{stats.conversionRate}% overall</span>
           </div>
           <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
             {[
               { value: stats.totalLeads, label: "Total", textColor: "text-blue-600", bgColor: "bg-blue-50 dark:bg-blue-950/30", borderColor: "border-blue-200 dark:border-blue-800", pct: null },
-              { value: stats.paidLeads, label: "Paid", textColor: "text-green-600", bgColor: "bg-green-50 dark:bg-green-950/30", borderColor: "border-green-200 dark:border-green-800", pct: stats.conversionRate },
-              { value: stats.verifiedLeads, label: "Verified", textColor: "text-purple-600", bgColor: "bg-purple-50 dark:bg-purple-950/30", borderColor: "border-purple-200 dark:border-purple-800", pct: stats.paidLeads > 0 ? Math.round((stats.verifiedLeads / stats.paidLeads) * 100) : 0 },
-              { value: stats.disbursedLeads, label: "Disbursed", textColor: "text-teal-600", bgColor: "bg-teal-50 dark:bg-teal-950/30", borderColor: "border-teal-200 dark:border-teal-800", pct: stats.verifiedLeads > 0 ? Math.round((stats.disbursedLeads / stats.verifiedLeads) * 100) : 0 },
-              { value: stats.lostLeads, label: "Lost", textColor: "text-red-500", bgColor: "bg-red-50 dark:bg-red-950/30", borderColor: "border-red-200 dark:border-red-800", pct: stats.totalLeads > 0 ? Math.round((stats.lostLeads / stats.totalLeads) * 100) : 0 },
+              { value: stats.paidLeads, label: "Confirmed", textColor: "text-green-600", bgColor: "bg-green-50 dark:bg-green-950/30", borderColor: "border-green-200 dark:border-green-800", pct: stats.conversionRate },
+              { value: stats.verifiedLeads, label: "Processing", textColor: "text-indigo-600", bgColor: "bg-indigo-50 dark:bg-indigo-950/30", borderColor: "border-indigo-200 dark:border-indigo-800", pct: stats.paidLeads > 0 ? Math.round((stats.verifiedLeads / stats.paidLeads) * 100) : 0 },
+              { value: stats.disbursedLeads, label: "Delivered", textColor: "text-emerald-600", bgColor: "bg-emerald-50 dark:bg-emerald-950/30", borderColor: "border-emerald-200 dark:border-emerald-800", pct: stats.verifiedLeads > 0 ? Math.round((stats.disbursedLeads / stats.verifiedLeads) * 100) : 0 },
+              { value: stats.lostLeads, label: "Cancelled", textColor: "text-red-500", bgColor: "bg-red-50 dark:bg-red-950/30", borderColor: "border-red-200 dark:border-red-800", pct: stats.totalLeads > 0 ? Math.round((stats.lostLeads / stats.totalLeads) * 100) : 0 },
             ].map((stage) => (
               <div key={stage.label} className={`${stage.bgColor} rounded-lg border ${stage.borderColor} p-2 sm:p-3 text-center`}>
                 <p className={`text-base sm:text-xl font-bold ${stage.textColor}`}>{stage.value}</p>
@@ -89,11 +89,11 @@ const AdminDashboardView = ({
           </div>
           <div className="grid grid-cols-5 gap-1.5 mt-3 pt-2 border-t border-border">
             {[
-              { value: `${stats.conversionRate}%`, label: "Lead→Paid", color: "text-primary" },
-              { value: `₹${(stats.totalLeads > 0 ? Math.round(stats.totalRevenue / stats.totalLeads) : 0).toLocaleString("en-IN")}`, label: "Rev/Lead", color: "text-green-600" },
-              { value: `₹${(stats.totalLeads > 0 ? Math.round(stats.totalExpenses / stats.totalLeads) : 0).toLocaleString("en-IN")}`, label: "Exp/Lead", color: "text-orange-600" },
-              { value: `₹${(stats.paidLeads > 0 ? Math.round(stats.totalExpenses / stats.paidLeads) : 0).toLocaleString("en-IN")}`, label: "Exp/Paid", color: "text-red-600" },
-              { value: `₹${(stats.paidLeads > 0 ? Math.round((stats.totalRevenue - stats.totalExpenses) / stats.paidLeads) : 0).toLocaleString("en-IN")}`, label: "Profit/Paid", color: stats.paidLeads > 0 && (stats.totalRevenue - stats.totalExpenses) >= 0 ? "text-emerald-600" : "text-rose-600" },
+              { value: `${stats.conversionRate}%`, label: "Lead→Active", color: "text-primary" },
+              { value: `$${(stats.totalLeads > 0 ? Math.round(stats.totalRevenue / stats.totalLeads) : 0).toLocaleString("en-US")}`, label: "Rev/Lead", color: "text-green-600" },
+              { value: `$${(stats.totalLeads > 0 ? Math.round(stats.totalExpenses / stats.totalLeads) : 0).toLocaleString("en-US")}`, label: "Exp/Lead", color: "text-orange-600" },
+              { value: `$${(stats.paidLeads > 0 ? Math.round(stats.totalExpenses / stats.paidLeads) : 0).toLocaleString("en-US")}`, label: "Exp/Active", color: "text-red-600" },
+              { value: `$${(stats.paidLeads > 0 ? Math.round((stats.totalRevenue - stats.totalExpenses) / stats.paidLeads) : 0).toLocaleString("en-US")}`, label: "Profit/Active", color: stats.paidLeads > 0 && (stats.totalRevenue - stats.totalExpenses) >= 0 ? "text-emerald-600" : "text-rose-600" },
             ].map(m => (
               <div key={m.label} className="text-center p-1.5 rounded-lg bg-muted/30">
                 <p className={`text-[10px] sm:text-xs font-bold ${m.color}`}>{m.value}</p>
@@ -107,12 +107,12 @@ const AdminDashboardView = ({
       {/* Row 2: Finance Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div className="rounded-lg p-2 sm:p-2.5 border border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/40 dark:to-green-900/20">
-          <div className="flex items-center gap-1 mb-0.5"><IndianRupee className="w-3 h-3 text-green-600" /><span className="text-[9px] sm:text-[10px] font-medium text-green-700 dark:text-green-300">Revenue</span></div>
-          <p className="text-sm sm:text-lg font-bold text-green-700 dark:text-green-400">₹{stats.totalRevenue.toLocaleString("en-IN")}</p>
+          <div className="flex items-center gap-1 mb-0.5"><TrendingUp className="w-3 h-3 text-green-600" /><span className="text-[9px] sm:text-[10px] font-medium text-green-700 dark:text-green-300">Revenue</span></div>
+          <p className="text-sm sm:text-lg font-bold text-green-700 dark:text-green-400">${stats.totalRevenue.toLocaleString("en-US")}</p>
         </div>
         <div className="rounded-lg p-2 sm:p-2.5 border border-red-200 dark:border-red-800 bg-gradient-to-br from-red-50 to-red-100/50 dark:from-red-950/40 dark:to-red-900/20">
           <div className="flex items-center gap-1 mb-0.5"><TrendingDown className="w-3 h-3 text-red-600" /><span className="text-[9px] sm:text-[10px] font-medium text-red-700 dark:text-red-300">Expenses</span></div>
-          <p className="text-sm sm:text-lg font-bold text-red-700 dark:text-red-400">₹{stats.totalExpenses.toLocaleString("en-IN")}</p>
+          <p className="text-sm sm:text-lg font-bold text-red-700 dark:text-red-400">${stats.totalExpenses.toLocaleString("en-US")}</p>
         </div>
         <div className="rounded-lg p-2 sm:p-2.5 border border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/40 dark:to-amber-900/20">
           <div className="flex items-center gap-1 mb-1">
@@ -122,18 +122,18 @@ const AdminDashboardView = ({
           <div className="space-y-0.5">
             <div className="flex justify-between text-[9px] sm:text-[10px]">
               <span className="text-amber-600 dark:text-amber-400">Output</span>
-              <span className="font-medium text-amber-700 dark:text-amber-300">₹{Math.round(stats.outputGST).toLocaleString("en-IN")}</span>
+              <span className="font-medium text-amber-700 dark:text-amber-300">${Math.round(stats.outputGST).toLocaleString("en-US")}</span>
             </div>
             <div className="flex justify-between text-[9px] sm:text-[10px]">
               <span className="text-green-600 dark:text-green-400">Input</span>
-              <span className="font-medium text-green-700 dark:text-green-300">₹{Math.round(stats.inputGST).toLocaleString("en-IN")}</span>
+              <span className="font-medium text-green-700 dark:text-green-300">${Math.round(stats.inputGST).toLocaleString("en-US")}</span>
             </div>
             <div className="border-t border-amber-300 dark:border-amber-700 pt-0.5 flex justify-between text-[10px] sm:text-xs font-bold">
               <span className={stats.gstPayable >= 0 ? "text-amber-800 dark:text-amber-300" : "text-green-700 dark:text-green-400"}>
                 {stats.gstPayable >= 0 ? "Payable" : "ITC Credit"}
               </span>
               <span className={stats.gstPayable >= 0 ? "text-amber-800 dark:text-amber-300" : "text-green-700 dark:text-green-400"}>
-                ₹{Math.round(Math.abs(stats.gstPayable)).toLocaleString("en-IN")}
+                ${Math.round(Math.abs(stats.gstPayable)).toLocaleString("en-US")}
               </span>
             </div>
           </div>
@@ -149,7 +149,7 @@ const AdminDashboardView = ({
             )}
           </div>
           <p className={`text-sm sm:text-lg font-bold ${netProfit >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400"}`}>
-            {netProfit < 0 && "-"}₹{Math.abs(Math.round(netProfit)).toLocaleString("en-IN")}
+            {netProfit < 0 && "-"}${Math.abs(Math.round(netProfit)).toLocaleString("en-US")}
           </p>
         </div>
       </div>
@@ -166,7 +166,7 @@ const AdminDashboardView = ({
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm font-semibold">Payment Sources</span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground">{totalPayments} • ₹{(totalPaymentAmount / 1000).toFixed(1)}k</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">{totalPayments} • ${(totalPaymentAmount / 1000).toFixed(1)}k</span>
               </div>
               <div className="grid grid-cols-5 gap-1.5">
                 {paymentSources.map((p) => {
@@ -174,7 +174,7 @@ const AdminDashboardView = ({
                   return (
                     <div key={p.source} className="text-center p-2 rounded-lg bg-muted/30 relative overflow-hidden">
                       <IconComp className={`w-4 h-4 mx-auto mb-1 ${p.color.split(' ')[1]}`} />
-                      <p className="text-xs sm:text-sm font-bold">₹{(p.amount / 1000).toFixed(1)}k</p>
+                      <p className="text-xs sm:text-sm font-bold">${(p.amount / 1000).toFixed(1)}k</p>
                       <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{p.source} ({p.count})</p>
                     </div>
                   );

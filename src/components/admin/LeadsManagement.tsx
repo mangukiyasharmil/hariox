@@ -278,7 +278,7 @@ const LeadsManagement = () => {
   const handleCall = (phone: string) => window.open(`tel:+91${phone}`, "_self");
   const handleWhatsApp = (phone: string, name: string) => {
     const companyName = currentCompany?.name || "Credit Hariox";
-    const message = `Hello ${name}, this is ${companyName}. We received your loan application and would like to assist you.`;
+    const message = `Hello ${name}, this is ${companyName}. We received your order enquiry and would like to assist you.`;
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -361,41 +361,43 @@ const LeadsManagement = () => {
       verification: "bg-purple-100 text-purple-800",
       documents_pending: "bg-orange-100 text-orange-800",
       documents_uploaded: "bg-cyan-100 text-cyan-800",
-      verified: "bg-emerald-100 text-emerald-800",
+      verified: "bg-indigo-100 text-indigo-800",
       rejected: "bg-red-100 text-red-800",
-      processing: "bg-indigo-100 text-indigo-800",
+      processing: "bg-blue-100 text-blue-800",
       approved: "bg-teal-100 text-teal-800",
-      disbursed: "bg-blue-100 text-blue-800",
+      disbursed: "bg-emerald-100 text-emerald-800",
+      lost: "bg-gray-100 text-gray-600",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      unpaid: "Pending Lead",
-      paid: "Active Customer",
-      verification: "Verification",
-      documents_pending: "Docs Pending",
-      documents_uploaded: "Docs Uploaded",
-      verified: "Verified",
-      rejected: "Rejected",
-      processing: "Processing",
-      approved: "Approved",
-      disbursed: "Onboarded",
+      unpaid: "New Enquiry",
+      paid: "Order Confirmed",
+      verification: "In Review",
+      documents_pending: "Payment Pending",
+      documents_uploaded: "Payment Received",
+      verified: "Processing",
+      rejected: "Cancelled",
+      processing: "Packed",
+      approved: "Shipped",
+      disbursed: "Delivered",
+      lost: "Returned",
     };
     return labels[status] || status.replace(/_/g, " ");
   };
 
-  // Simplified status groupings for easier filtering
+  // E-commerce order pipeline stage filters
   const statusGroups = [
-    { value: "all", label: "All Status" },
-    { value: "unpaid", label: "Pending Leads" },
-    { value: "paid", label: "Active Customers" },
-    { value: "docs", label: "Onboarding Pending" }, 
-    { value: "verified", label: "Verified" },
-    { value: "processing", label: "Processing" }, 
-    { value: "disbursed", label: "Onboarded" },
-    { value: "rejected", label: "Rejected" },
+    { value: "all", label: "All Orders" },
+    { value: "unpaid", label: "New Enquiries" },
+    { value: "paid", label: "Order Confirmed" },
+    { value: "docs", label: "Awaiting Payment" },
+    { value: "verified", label: "Processing" },
+    { value: "processing", label: "Packed" },
+    { value: "disbursed", label: "Delivered" },
+    { value: "rejected", label: "Cancelled" },
   ];
 
   const statuses = ["all", "unpaid", "paid", "verification", "documents_pending", "documents_uploaded", "verified", "rejected", "processing", "approved", "disbursed"];
@@ -437,7 +439,7 @@ const LeadsManagement = () => {
             <option value="all">All Sources</option>
             <option value="website">Website</option>
             <option value="whatsapp">WhatsApp</option>
-            <option value="telecaller">Telecaller</option>
+            <option value="telecaller">Sales Agent</option>
             <option value="sms">SMS</option>
             <option value="exit_intent">Exit Popup</option>
           </select>

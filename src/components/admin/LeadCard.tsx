@@ -44,10 +44,35 @@ const LeadCard = ({
   paymentLink,
   showMarkPaid = true,
 }: LeadCardProps) => {
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      unpaid: "New Enquiry",
+      paid: "Confirmed",
+      verification: "In Review",
+      documents_pending: "Pmt Pending",
+      documents_uploaded: "Pmt Received",
+      verified: "Processing",
+      rejected: "Cancelled",
+      processing: "Packed",
+      approved: "Shipped",
+      disbursed: "Delivered",
+      lost: "Returned",
+    };
+    return labels[status] || status.replace(/_/g, " ");
+  };
+
   const getStatusColor = (status: string) => {
-    if (status === "lost") return "bg-gray-100 text-gray-800";
-    return status === "unpaid" 
-      ? "bg-yellow-100 text-yellow-800" 
+    if (status === "lost") return "bg-gray-100 text-gray-700";
+    if (status === "disbursed") return "bg-emerald-100 text-emerald-800";
+    if (status === "approved") return "bg-teal-100 text-teal-800";
+    if (status === "processing") return "bg-blue-100 text-blue-800";
+    if (status === "verified") return "bg-indigo-100 text-indigo-800";
+    if (status === "documents_uploaded") return "bg-cyan-100 text-cyan-800";
+    if (status === "documents_pending") return "bg-orange-100 text-orange-800";
+    if (status === "verification") return "bg-purple-100 text-purple-800";
+    if (status === "rejected") return "bg-red-100 text-red-800";
+    return status === "unpaid"
+      ? "bg-yellow-100 text-yellow-800"
       : "bg-green-100 text-green-800";
   };
 
@@ -94,16 +119,18 @@ const LeadCard = ({
                 showLabel={false}
               />
               <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(lead.status)}`}>
-                {lead.status}
+                {getStatusLabel(lead.status)}
               </span>
             </div>
           </div>
 
           {/* Details */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-            <span className="capitalize">{lead.loan_type}</span>
+            <span className="capitalize">
+              {lead.loan_type === 'personal' ? 'Light Blue' : lead.loan_type === 'business' ? 'Pro Bundle' : lead.loan_type === 'home' ? 'Starter' : lead.loan_type === 'marriage' ? 'Custom' : lead.loan_type}
+            </span>
             <span>•</span>
-            <span>₹{Number(lead.loan_amount).toLocaleString("en-IN")}</span>
+            <span>${Number(lead.loan_amount || 129).toLocaleString("en-US")}</span>
           </div>
 
           {/* Date & Time */}
@@ -255,7 +282,7 @@ const LeadCard = ({
                       <XCircle className="w-4 h-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom"><p>Mark Lost</p></TooltipContent>
+                  <TooltipContent side="bottom"><p>Mark Returned</p></TooltipContent>
                 </Tooltip>
               </>
             )}
@@ -288,13 +315,15 @@ const LeadCard = ({
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
         <span className="text-[10px]">{new Date(lead.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}</span>
         <span>•</span>
-        <span className="capitalize">{lead.loan_type}</span>
-        <span>₹{Number(lead.loan_amount).toLocaleString("en-IN")}</span>
+        <span className="capitalize">
+          {lead.loan_type === 'personal' ? 'Light Blue' : lead.loan_type === 'business' ? 'Pro Bundle' : lead.loan_type === 'home' ? 'Starter' : lead.loan_type === 'marriage' ? 'Custom' : lead.loan_type}
+        </span>
+        <span>${Number(lead.loan_amount || 129).toLocaleString("en-US")}</span>
       </div>
 
       {/* Status badge */}
       <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium flex-shrink-0 ${getStatusColor(lead.status)}`}>
-        {lead.status}
+        {getStatusLabel(lead.status)}
       </span>
 
       {/* API Chat button */}
