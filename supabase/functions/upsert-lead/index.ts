@@ -50,7 +50,44 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const body = await req.json();
+    let body = await req.json();
+
+    // Auto-detect Shopify Webhook payload
+    const isShopify = req.headers.get("x-shopify-topic") || body.line_items || body.customer || body.billing_address;
+    if (isShopify) {
+      const topic = req.headers.get("x-shopify-topic") || "";
+      const isOrder = topic.includes("orders") || body.order_number !== undefined;
+      const shopifyCust = body.customer || {};
+      const shipAddr = body.shipping_address || body.billing_address || {};
+      
+      let rawPhone = body.phone || shopifyCust.phone || shipAddr.phone || "";
+      let cleanPhone = rawPhone.replace(/\D/g, "");
+      if (cleanPhone.length > 10) {
+        cleanPhone = cleanPhone.slice(-10);
+      }
+      if (!cleanPhone) {
+        cleanPhone = "9999999999";
+      }
+
+      body = {
+        phone: cleanPhone,
+        full_name: `${shopifyCust.first_name || shipAddr.first_name || "Shopify"} ${shopifyCust.last_name || shipAddr.last_name || "Customer"}`.trim(),
+        email: body.email || shopifyCust.email || "no-email@shopify.com",
+        city: shipAddr.city || "N/A",
+        state: shipAddr.country || "India",
+        loan_type: "personal",
+        loan_amount: Number(body.total_price || body.current_total_price || 129),
+        application_id: String(body.order_number || body.id || ""),
+        employment_type: "salaried",
+        monthly_income: 0,
+        source: "shopify",
+        is_draft: !isOrder,
+      };
+
+      if (isOrder) {
+        body.status = "paid";
+      }
+    }
 
     let parsedSource = body.source || "website";
     let parsedCibil = body.cibil_score_range || body.cibil_score || null;
@@ -70,8 +107,8 @@ Deno.serve(async (req) => {
       parsedCity = parsedCity.split(",")[0].trim();
     }
 
-    // Validate phone (required for all operations)
-    const phoneRegex = /^[6-9][0-9]{9}$/;
+    // Validate phone (required for all operations) - relax for international numbers
+    const phoneRegex = /^[0-9]{10}$/;
     const cleanPhone = String(body.phone || "").replace(/\D/g, "").slice(-10);
     
     if (!phoneRegex.test(cleanPhone)) {
