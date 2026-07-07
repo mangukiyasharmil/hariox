@@ -422,10 +422,14 @@ Deno.serve(async (req) => {
 
     if (existingLead) {
       // UPDATE existing lead
-      const updatePayload = {
+      const updatePayload: Record<string, any> = {
         ...leadData,
         company_id: companyId || existingLead.company_id || null
       };
+
+      if (body.status) {
+        updatePayload.status = body.status;
+      }
 
       const { error: updateError } = await supabase
         .from("leads")
@@ -510,7 +514,7 @@ Deno.serve(async (req) => {
         id: leadId,
         phone: cleanPhone,
         ...leadData,
-        status: "unpaid",
+        status: body.status || "unpaid",
         source: parsedSource || "website",
         utm_source: body.utm_source || null,
         utm_medium: body.utm_medium || null,
