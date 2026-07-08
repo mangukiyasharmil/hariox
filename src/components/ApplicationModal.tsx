@@ -281,12 +281,27 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
 
       if (existingLead) {
         setExistingLeadId(existingLead.id);
-        setIsReturningCustomer(true);
         
         const isPlaceholderLead = existingLead.full_name === "Phone Lead" || 
-          existingLead.email?.includes("@placeholder.hariox.com") ||
+          existingLead.email?.includes("@placeholder") ||
           !existingLead.full_name || !existingLead.email;
         
+        if (isPlaceholderLead) {
+          // This is a minimal phone lead - customer needs to fill details
+          // Require OTP verification for security
+          setFormData(prev => ({ ...prev, phone }));
+          setIsReturningCustomer(false);
+          setShowOtpStep(true);
+          return "new";
+        }
+
+        setIsReturningCustomer(true);
+        
+        // Set sessionStorage session immediately for returning customers
+        sessionStorage.setItem("customerPhone", existingLead.phone);
+        sessionStorage.setItem("customerLeadId", existingLead.id);
+        sessionStorage.setItem("customerSessionAt", Date.now().toString());
+
         // Pre-fill form with existing data
         setFormData(prev => ({
           ...prev,
@@ -356,10 +371,6 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
         }
         
         // Already paid/processing/verified/disbursed → bypass OTP and redirect to customer portal
-        sessionStorage.setItem("customerPhone", existingLead.phone);
-        sessionStorage.setItem("customerLeadId", existingLead.id);
-        sessionStorage.setItem("customerSessionAt", Date.now().toString());
-
         navigate("/my-account", {
           state: {
             leadId: existingLead.id,

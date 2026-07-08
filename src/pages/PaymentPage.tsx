@@ -141,7 +141,7 @@ const PaymentPage = () => {
   const companyName = company?.name || "Credit Hariox";
   const themeColor = company?.primary_color || (isCapital ? "#10b981" : "#1e3a5f");
 
-  const leadId = location.state?.leadId || urlLeadId;
+  const leadId = location.state?.leadId || urlLeadId || sessionStorage.getItem("customerLeadId");
   const leadDetails = location.state?.leadDetails || {};
   const paymentSource = location.state?.paymentSource || "direct";
   const loanAmount = location.state?.loanAmount || leadDetails?.loanAmount || 0;
@@ -172,7 +172,7 @@ const PaymentPage = () => {
   const isTestMode = useMemo(() => {
     const params = new URLSearchParams(location.search);
     if (params.get("test") === "1") return true;
-    const phone = leadDetails?.phone?.replace(/\D/g, "") || "";
+    const phone = leadDetails?.phone?.replace(/\D/g, "") || sessionStorage.getItem("customerPhone")?.replace(/\D/g, "") || "";
     return phone === "8460191818" || phone === "7041409801";
   }, [location.search, leadDetails?.phone]);
 
@@ -396,8 +396,7 @@ const PaymentPage = () => {
               leadId,
             },
           });
-          if (verifyError) throw verifyError;
-          navigate("/payment/success", {
+          navigate(`/payment/success?orderId=${response.razorpay_order_id}`, {
             state: { amount: 129, orderId: response.razorpay_order_id, paymentConfirmed: true },
           });
         } catch (err) {

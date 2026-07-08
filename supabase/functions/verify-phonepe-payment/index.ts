@@ -96,9 +96,9 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const phonepeClientId = Deno.env.get("PHONEPE_CLIENT_ID")!;
-    const phonepeClientSecret = Deno.env.get("PHONEPE_CLIENT_SECRET")!;
-    const phonepeMerchantId = Deno.env.get("PHONEPE_MERCHANT_ID")!;
+    const phonepeClientId = (Deno.env.get("PHONEPE_CLIENT_ID") || "").trim();
+    const phonepeClientSecret = (Deno.env.get("PHONEPE_CLIENT_SECRET") || "").trim();
+    const phonepeMerchantId = (Deno.env.get("PHONEPE_MERCHANT_ID") || "").trim();
     const rawClientVersion = (Deno.env.get("PHONEPE_CLIENT_VERSION") || "1").trim();
     const phonepeClientVersion = /^\d+$/.test(rawClientVersion) ? rawClientVersion : "1";
     
@@ -121,8 +121,8 @@ serve(async (req) => {
 
     // If no state provided, check with PhonePe API
     if (!paymentState) {
-      const isSandbox = payment.total_amount <= 1; // Test mode check
-      const phonepeHost = isSandbox ? PHONEPE_HOST_SANDBOX : PHONEPE_HOST_PROD;
+      const isSandbox = false; // Always use production PhonePe host since create-phonepe-order does
+      const phonepeHost = PHONEPE_HOST_PROD;
 
       try {
         const authToken = await getPhonePeAuthToken(

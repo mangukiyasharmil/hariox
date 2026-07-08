@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { 
   Phone, Loader2, Upload, FileCheck, CheckCircle2, AlertCircle, 
   Receipt, FileText, User, Building2, Clock, LogOut, Download,
@@ -74,6 +74,7 @@ interface Document {
 }
 
 const CustomerPortal = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState<"phone" | "otp" | "dashboard">("phone");
   const [phone, setPhone] = useState("");
@@ -137,25 +138,33 @@ const CustomerPortal = () => {
     setError(null);
 
     try {
-      // Check if lead exists with this phone and is paid
+      // Check if lead exists with this phone
       const { data: leads } = await supabase
         .rpc("lookup_leads_by_phone", { _phone: cleanPhone });
 
-      const paidLeads = (leads || []).filter((l: any) => l.status !== "unpaid");
+      const allLeads = leads || [];
+      const realLeads = allLeads.filter((l: any) => {
+        const isPlaceholder = l.full_name === "Phone Lead" || 
+          l.email?.includes("@placeholder") ||
+          !l.full_name || !l.email;
+        return !isPlaceholder;
+      });
 
-      if (!paidLeads || paidLeads.length === 0) {
-        // Check for unpaid lead
-        const allLeads = leads || [];
-
-        if (allLeads.length > 0) {
-          setError("Your payment is pending. Please complete the payment first.");
-        } else {
-          setError("No application found with this mobile number.");
-        }
+      if (realLeads.length > 0) {
+        // returning customer who has completed the form once - completely bypass OTP!
+        sessionStorage.setItem("customerPhone", cleanPhone);
+        sessionStorage.setItem("customerLeadId", realLeads[0].id);
+        sessionStorage.setItem("customerSessionAt", String(Date.now()));
+        await fetchLeadData(realLeads[0].id);
         return;
       }
 
-      // Send OTP
+      if (allLeads.length === 0) {
+        setError("No application found with this mobile number.");
+        return;
+      }
+
+      // If it exists but only as a placeholder lead (no completed form/OTP verify yet), send OTP
       const response = await supabase.functions.invoke("send-otp", {
         body: { phone: cleanPhone },
       });
@@ -195,13 +204,12 @@ const CustomerPortal = () => {
       const { data: leads } = await supabase
         .rpc("lookup_leads_by_phone", { _phone: phone });
 
-      const paidLeads = (leads || []).filter((l: any) => l.status !== "unpaid");
-
-      if (paidLeads && paidLeads.length > 0) {
+      const allLeads = leads || [];
+      if (allLeads.length > 0) {
         sessionStorage.setItem("customerPhone", phone);
-        sessionStorage.setItem("customerLeadId", paidLeads[0].id);
+        sessionStorage.setItem("customerLeadId", allLeads[0].id);
         sessionStorage.setItem("customerSessionAt", String(Date.now()));
-        await fetchLeadData(paidLeads[0].id);
+        await fetchLeadData(allLeads[0].id);
       }
     } catch (err) {
       console.error("Verify error:", err);
@@ -633,6 +641,34 @@ const CustomerPortal = () => {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
+        {lead?.status === "unpaid" && (
+          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="text-left">
+              <h3 className="text-lg font-bold text-yellow-900">Payment Pending</h3>
+              <p className="text-sm text-yellow-700 mt-1">
+                Your application profile is complete. Please complete the one-time registration fee payment of $129 USD to start verification.
+              </p>
+            </div>
+            <Button 
+              className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-6 py-5 rounded-lg shrink-0 shadow-md"
+              onClick={() => {
+                navigate("/payment", {
+                  state: {
+                    leadId: lead.id,
+                    loanAmount: lead.loan_amount,
+                    leadDetails: {
+                      fullName: lead.full_name,
+                      email: lead.email,
+                      phone: lead.phone,
+                    }
+                  }
+                });
+              }}
+            >
+              Pay Now
+            </Button>
+          </div>
+        )}
         {/* Application Card */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
@@ -686,6 +722,7 @@ const CustomerPortal = () => {
                     Your application is with: <span className="text-blue-600">{statusLabels[lead.status]?.department}</span>
                   </p>
                   <p className="text-xs text-gray-600">
+                    {lead.status === 'unpaid' && "Your payment is pending. Please complete your payment to start document verification."}
                     {lead.status === 'paid' && "Our team will verify your details and contact you soon."}
                     {lead.status === 'verification' && "Your documents are being verified by our team."}
                     {lead.status === 'documents_pending' && "Please upload the required documents."}
