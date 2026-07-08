@@ -104,8 +104,8 @@ const FinanceApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
   const paymentPath = `/payment?company=${company?.slug || 'finance'}&gateway=razorpay`;
   
   const phoneRegex = /^[6-9]\d{9}$/;
-  const validInitialPhone = phoneRegex.test(String(initialPhone ?? "").replace(/\D/g, "").slice(0, 10))
-    ? String(initialPhone).replace(/\D/g, "").slice(0, 10)
+  const validInitialPhone = phoneRegex.test(String(initialPhone ?? "").replace(/\D/g, "").slice(-10))
+    ? String(initialPhone).replace(/\D/g, "").slice(-10)
     : null;
   
   const [step, setStep] = useState(() => validInitialPhone ? 1 : 0);
@@ -146,7 +146,7 @@ const FinanceApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
   };
 
   const handlePhoneEligibilityCheck = async (phoneOverride?: string) => {
-    const phone = String(phoneOverride ?? phoneInput).replace(/\D/g, "").slice(0, 10);
+    const phone = String(phoneOverride ?? phoneInput).replace(/\D/g, "").slice(-10);
 
     if (!phoneRegex.test(phone)) {
       setErrors({ phone: "Enter valid 10-digit mobile number starting with 6-9" });
@@ -222,12 +222,14 @@ const FinanceApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
             setStep(1);
           }
         } else {
-          navigate(`${paymentPath}&leadId=${encodeURIComponent(existingLead.id)}`, {
+          // Already paid/processing/verified/disbursed → bypass OTP and redirect to customer portal
+          sessionStorage.setItem("customerPhone", existingLead.phone);
+          sessionStorage.setItem("customerLeadId", existingLead.id);
+          sessionStorage.setItem("customerSessionAt", Date.now().toString());
+
+          navigate("/my-account", {
             state: {
               leadId: existingLead.id,
-              company: company?.slug || "finance",
-              paymentSource: "direct",
-              loanAmount: existingLead.loan_amount,
               leadDetails: {
                 fullName: existingLead.full_name,
                 email: existingLead.email,
@@ -285,7 +287,7 @@ const FinanceApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
       return;
     }
 
-    const phone = String(initialPhone ?? "").replace(/\D/g, "").slice(0, 10);
+    const phone = String(initialPhone ?? "").replace(/\D/g, "").slice(-10);
 
     if (!phoneRegex.test(phone)) return;
     if (didAutoCheckRef.current) return;
@@ -561,7 +563,7 @@ const FinanceApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
                     type="tel"
                     placeholder="Enter 10-digit mobile number"
                     value={phoneInput}
-                    onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                    onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, "").slice(-10))}
                     className="h-14 text-lg"
                     maxLength={10}
                   />

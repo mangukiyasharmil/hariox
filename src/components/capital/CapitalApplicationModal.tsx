@@ -102,8 +102,8 @@ const CapitalApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
   // Check if we have a valid initial phone - but don't auto-skip to step 1
   // Let the eligibility check determine if they're returning (skip OTP) or new (require OTP)
   const phoneRegex = /^[6-9]\d{9}$/;
-  const validInitialPhone = phoneRegex.test(String(initialPhone ?? "").replace(/\D/g, "").slice(0, 10))
-    ? String(initialPhone).replace(/\D/g, "").slice(0, 10)
+  const validInitialPhone = phoneRegex.test(String(initialPhone ?? "").replace(/\D/g, "").slice(-10))
+    ? String(initialPhone).replace(/\D/g, "").slice(-10)
     : null;
   
   const [step, setStep] = useState(0); // Always start at step 0, let eligibility check determine flow
@@ -152,7 +152,7 @@ const CapitalApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
     const phoneRegex = /^[6-9]\d{9}$/;
     const phone = String(phoneOverride ?? phoneInput)
       .replace(/\D/g, "")
-      .slice(0, 10);
+      .slice(-10);
 
     if (!phoneRegex.test(phone)) {
       setErrors({ phone: "Enter valid 10-digit mobile number starting with 6-9" });
@@ -235,11 +235,14 @@ const CapitalApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
             setStep(1);
           }
         } else {
-          // Already paid/processing
-          navigate(`/payment${companyParam}`, {
+          // Already paid/processing/verified/disbursed → bypass OTP and redirect to customer portal
+          sessionStorage.setItem("customerPhone", existingLead.phone);
+          sessionStorage.setItem("customerLeadId", existingLead.id);
+          sessionStorage.setItem("customerSessionAt", Date.now().toString());
+
+          navigate("/my-account", {
             state: {
               leadId: existingLead.id,
-              loanAmount: existingLead.loan_amount,
               leadDetails: {
                 fullName: existingLead.full_name,
                 email: existingLead.email,
@@ -314,7 +317,7 @@ const CapitalApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
     const phoneRegex = /^[6-9]\d{9}$/;
     const phone = String(initialPhone ?? "")
       .replace(/\D/g, "")
-      .slice(0, 10);
+      .slice(-10);
 
     if (!phoneRegex.test(phone)) return;
     if (didAutoCheckRef.current) return;
@@ -671,7 +674,7 @@ const CapitalApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }:
                           placeholder="Enter 10-digit mobile number"
                           value={phoneInput}
                           onChange={(e) => {
-                            setPhoneInput(e.target.value.replace(/\D/g, "").slice(0, 10));
+                            setPhoneInput(e.target.value.replace(/\D/g, "").slice(-10));
                             if (errors.phone) setErrors({});
                           }}
                           className={`h-14 text-lg rounded-l-none rounded-r-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 ${errors.phone ? "border-red-500" : ""}`}

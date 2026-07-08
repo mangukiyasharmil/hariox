@@ -42,7 +42,7 @@ const trustBadges = [
 const CapitalHero = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [phone, setPhone] = useState("");
-  const normalizedPhone = phone.replace(/\D/g, "").slice(0, 10);
+  const normalizedPhone = phone.replace(/\D/g, "").slice(-10);
   const initialPhone = /^[6-9]\d{9}$/.test(normalizedPhone) ? normalizedPhone : undefined;
 
   // Animated counters
@@ -296,7 +296,7 @@ const CapitalHero = () => {
                       type="tel"
                       placeholder="Enter your mobile number"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(-10))}
                       className="w-full h-12 lg:h-14 pl-14 pr-4 text-base lg:text-lg rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
                       maxLength={10}
                     />

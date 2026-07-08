@@ -105,8 +105,8 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
   
   // Check if we have a valid initial phone to skip step 0
   const phoneRegex = /^[6-9]\d{9}$/;
-  const validInitialPhone = phoneRegex.test(String(initialPhone ?? "").replace(/\D/g, "").slice(0, 10))
-    ? String(initialPhone).replace(/\D/g, "").slice(0, 10)
+  const validInitialPhone = phoneRegex.test(String(initialPhone ?? "").replace(/\D/g, "").slice(-10))
+    ? String(initialPhone).replace(/\D/g, "").slice(-10)
     : null;
   
   const [step, setStep] = useState(0); // Always start at step 0, eligibility check will route
@@ -258,13 +258,11 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
     }
   };
 
-  // Phone eligibility check handler (Step 0)
-  // FLOW: Check existing lead FIRST → redirect/skip OTP if returning → OTP only for NEW customers
   const handlePhoneEligibilityCheck = async (phoneOverride?: string): Promise<"returning" | "new" | "redirected"> => {
     const phoneRegex = /^[6-9]\d{9}$/;
     const phone = String(phoneOverride ?? phoneInput)
       .replace(/\D/g, "")
-      .slice(0, 10);
+      .slice(-10);
 
     if (!phoneRegex.test(phone)) {
       setErrors({ phone: "Enter valid 10-digit mobile number starting with 6-9" });
@@ -357,11 +355,14 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
           }
         }
         
-        // Already paid/processing/verified/disbursed → redirect to payment
-        navigate("/payment", {
+        // Already paid/processing/verified/disbursed → bypass OTP and redirect to customer portal
+        sessionStorage.setItem("customerPhone", existingLead.phone);
+        sessionStorage.setItem("customerLeadId", existingLead.id);
+        sessionStorage.setItem("customerSessionAt", Date.now().toString());
+
+        navigate("/my-account", {
           state: {
             leadId: existingLead.id,
-            loanAmount: existingLead.loan_amount,
             leadDetails: {
               fullName: existingLead.full_name,
               email: existingLead.email,
@@ -432,7 +433,7 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
     const phoneRegex = /^[6-9]\d{9}$/;
     const phone = String(initialPhone ?? "")
       .replace(/\D/g, "")
-      .slice(0, 10);
+      .slice(-10);
 
     if (!phoneRegex.test(phone)) return;
     if (didAutoCheckRef.current) return;
@@ -767,7 +768,7 @@ const ApplicationModal = ({ isOpen, onClose, prefillData, initialPhone }: Applic
                           placeholder="Enter 10-digit mobile number"
                           value={phoneInput}
                           onChange={(e) => {
-                            setPhoneInput(e.target.value.replace(/\D/g, "").slice(0, 10));
+                            setPhoneInput(e.target.value.replace(/\D/g, "").slice(-10));
                             if (errors.phone) setErrors({});
                           }}
                           className={`rounded-l-none text-lg py-6 ${errors.phone ? "border-destructive" : ""}`}
